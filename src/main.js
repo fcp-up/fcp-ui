@@ -19,7 +19,7 @@ import IconSvg from 'components/Icon-svg';// svg 组件
 import vueWaves from './directive/waves';// 水波纹指令
 import errLog from 'store/errLog';// error log组件
 import './mock/index.js';  // 该项目所有请求使用mockjs模拟
-import AMap from 'vue-amap';  // 加载高德地图
+import VueAMap from 'vue-amap';  // 加载高德地图
 
 // register globally
 Vue.component('multiselect', Multiselect);
@@ -27,10 +27,10 @@ Vue.component('Sticky', Sticky);
 Vue.component('icon-svg', IconSvg)
 Vue.use(ElementUI);
 Vue.use(vueWaves);
-Vue.use(AMap);
+Vue.use(VueAMap);
 
 // 初始化vue-amap
-AMap.initAMapApiLoader({
+VueAMap.initAMapApiLoader({
   // 高德的key
   key: '3a4440897eafbd61c4270072b8580542',
   // 插件集合
