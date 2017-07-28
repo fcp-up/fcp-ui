@@ -21,11 +21,17 @@ const DeviceAlarmData = _import('devicealarmdata/index');
 /* devicemanage */
 const DeviceManage = _import('devicemanage/index');
 
+/* editdevice */
+const EditDevice = _import('devicemanage/editdevice');
+
 /* terminalstate */
 const TerminalState = _import('terminalstate/index');
 
 /* terminalmanage */
 const TerminalManage = _import('terminalmanage/index');
+
+/* editterminal */
+const EditTerminal = _import('terminalmanage/editterminal');
 
 /* error page */
 const Err404 = _import('error/404');
@@ -90,13 +96,15 @@ export const asyncRouterMap = [
     redirect: 'noredirect',
     icon: 'theme',
     noDropdown: true,
-    children: [{ path: 'index', component: DeviceManage, name: '设备管理' }]
+    children: [{ path: 'index', component: DeviceManage, name: '设备管理' },
+      { path: 'editdevice', component: EditDevice, name: '编辑设备' }]
   }, {
     path: '/terminalmanage',
     component: Layout,
     redirect: 'noredirect',
     icon: 'theme',
     noDropdown: true,
-    children: [{ path: 'index', component: TerminalManage, name: '终端管理' }]
+    children: [{ path: 'index', component: TerminalManage, name: '终端管理' },
+      { path: 'editterminal', component: EditTerminal, name: '编辑终端' }]
   }, { path: '*', redirect: '/404', hidden: true }
 ];

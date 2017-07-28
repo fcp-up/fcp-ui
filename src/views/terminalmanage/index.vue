@@ -1,24 +1,14 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="状态类型">
-          <el-select v-model="formInline.currentState" placeholder="请选择">
-            <el-option v-for="item in formInline.states" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="在/离线时间">
-          <el-date-picker v-model="formInline.dateValue" type="daterange" placeholder="选择时间范围">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="终端编号">
-          <el-input v-model="formInline.terminalNo" placeholder="输入关键词检索"></el-input>
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">     
+        <el-form-item>
+          <el-input v-model="formInline.terminalNo" placeholder="输入终端编号或名称关键词检索"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onQuery">查询</el-button>
-          <el-button style='margin-bottom:20px;float:right' type="primary" icon="document" @click="handleDownload">导出excel</el-button>
-          <el-button type="primary" @click="onAdd">新增</el-button>
+          <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
+          <el-button type="primary" icon="document" @click="handleDownload">导出excel</el-button>
+          <el-button style='margin-bottom:20px;float:right' type="primary" icon="plus" @click="onAdd">新增</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -26,18 +16,18 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column>
-        <el-table-column prop="alarmPhone" label="报警电话" width="200">
+        <el-table-column prop="name" label="终端名称" width="150">
         </el-table-column>
-        <el-table-column prop="state" label="当前状态" width="100">
-        </el-table-column>
-        <el-table-column prop="date" label="状态时间" width="120">
-        </el-table-column>
+         <!-- <el-table-column prop="alarmPhone" label="报警电话" width="300">  
+        </el-table-column>          -->
+        <el-table-column prop="position" label="位置信息" width="250">
+        </el-table-column> 
         <el-table-column prop="address" label="安装地址" width="300">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -57,6 +47,9 @@
 }
 .el-form-item {
   margin-bottom: 0px;
+}
+.el-table-column {
+  white-space: nowrap;            
 }
 .pagination {
   margin:0 auto
@@ -80,29 +73,25 @@ export default {
         no: '1234512345',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
+        position: '102.00000111,73.000011116778',
         alarmPhone: '13500000000'
       }, {
         no: '1231',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
+        position: '102.00000111,73.000011116778',
         alarmPhone: '13500000000'
       }, {
         no: '12311',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
+        position: '102.00000111,73.000011116778',
         alarmPhone: '13500000000'
       }, {
         no: '123111',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
+        position: '102.00000111,73.000011116778',
         alarmPhone: '13500000000'
       }],
       currentPage4: 4
