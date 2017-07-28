@@ -12,17 +12,20 @@ const Login = _import('login/index');
 /* monitor */
 const Monitor = _import('monitor/index');
 
-/* centerstate */
-const CenterState = _import('centerstate/index');
-
 /* devicedata */
 const DeviceData = _import('devicedata/index');
 
-/* alarmdata */
-const AlarmData = _import('alarmdata/index');
+/* devicealarmdata */
+const DeviceAlarmData = _import('devicealarmdata/index');
 
-/* devicephone */
-const DevicePhone = _import('devicephone/index');
+/* devicemanage */
+const DeviceManage = _import('devicemanage/index');
+
+/* terminalstate */
+const TerminalState = _import('terminalstate/index');
+
+/* terminalmanage */
+const TerminalManage = _import('terminalmanage/index');
 
 /* error page */
 const Err404 = _import('error/404');
@@ -61,36 +64,39 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/centerstate',
+    path: '/terminalstate',
     component: Layout,
     redirect: 'noredirect',
     icon: 'bug',
     noDropdown: true,
-    children: [{ path: 'centerstate', component: CenterState, name: '终端状态' }]
-  },
-  {
+    children: [{ path: 'terminalstate', component: TerminalState, name: '终端状态' }]
+  }, {
     path: '/devicedata',
     component: Layout,
     redirect: 'noredirect',
     icon: 'EXCEL',
     noDropdown: true,
     children: [{ path: 'devicedata', component: DeviceData, name: '设备数据' }]
-  },
-  {
-    path: '/alarmdata',
+  }, {
+    path: '/devicealarmdata',
     component: Layout,
     redirect: 'noredirect',
     icon: 'theme',
     noDropdown: true,
-    children: [{ path: 'alarmdata', component: AlarmData, name: '报警数据' }]
-  },
-  {
-    path: '/devicephone',
+    children: [{ path: 'devicealarmdata', component: DeviceAlarmData, name: '报警日志' }]
+  }, {
+    path: '/devicemanage',
     component: Layout,
     redirect: 'noredirect',
     icon: 'theme',
     noDropdown: true,
-    children: [{ path: 'index', component: DevicePhone, name: '报警电话' }]
-  },
-  { path: '*', redirect: '/404', hidden: true }
+    children: [{ path: 'index', component: DeviceManage, name: '设备管理' }]
+  }, {
+    path: '/terminalmanage',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'theme',
+    noDropdown: true,
+    children: [{ path: 'index', component: TerminalManage, name: '终端管理' }]
+  }, { path: '*', redirect: '/404', hidden: true }
 ];
