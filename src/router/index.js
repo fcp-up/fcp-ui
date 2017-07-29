@@ -93,18 +93,18 @@ export const asyncRouterMap = [
   }, {
     path: '/devicemanage',
     component: Layout,
-    redirect: 'noredirect',
+    redirect: '/devicemanage/index',
     icon: 'theme',
     noDropdown: true,
     children: [{ path: 'index', component: DeviceManage, name: '设备管理' },
-      { path: 'editdevice', component: EditDevice, name: '编辑设备' }]
+      { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true }]
   }, {
     path: '/terminalmanage',
     component: Layout,
-    redirect: 'noredirect',
+    redirect: '/terminalmanage/index',
     icon: 'theme',
     noDropdown: true,
     children: [{ path: 'index', component: TerminalManage, name: '终端管理' },
-      { path: 'editterminal', component: EditTerminal, name: '编辑终端' }]
+      { path: 'editterminal', component: EditTerminal, name: '编辑终端', hidden: true }]
   }, { path: '*', redirect: '/404', hidden: true }
 ];

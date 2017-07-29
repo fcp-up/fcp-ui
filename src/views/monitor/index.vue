@@ -1,6 +1,6 @@
 <template>
   <div class="monitor-container">
-    <el-amap :vid="amapDemo" :zoom="zoom" :center="center">
+    <el-amap :vid="amapcontainer" :zoom="zoom" :center="center">
       <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
     </el-amap>
   </div>

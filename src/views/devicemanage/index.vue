@@ -137,6 +137,7 @@ export default {
     },
     handleEdit(index, row) {
       console.log(index, row);
+      this.$router.push({ path: 'editdevice' });
     },
     handleDelete(index, row) {
       console.log(index, row);
