@@ -13,7 +13,9 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="list" style="width: 100%">
+        <el-table-column type="index" label="序号" width="80">
+        </el-table-column>
         <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column>
         <el-table-column prop="name" label="终端名称" width="150">
@@ -57,42 +59,37 @@
 </style>
 
 <script>
-import {getTerminalList} from '../../api/terminal';
+import {getTerminalList} from 'api/terminal';
 export default {
   data() {
     return {
       formInline: {
         dateValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
         states: [{ 'label': '全部', value: -1 }, { 'label': '在线', value: 1 }, { 'label': '离线', value: 0 }],
-        currentState: -1,
-        terminalNo: ''
+        lastOnlineState: -1,
+        no: ''
       },
-      list: null,
       listLoading: true,
-      tableData: [{
+      list: [{
         no: '1234512345',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
+        position: '102.00000111,73.000011116778'
       }, {
         no: '1231',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
+        position: '102.00000111,73.000011116778'
       }, {
         no: '12311',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
+        position: '102.00000111,73.000011116778'
       }, {
         no: '123111',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
+        position: '102.00000111,73.000011116778'
       }],
       currentPage4: 4
     };
@@ -137,7 +134,7 @@ export default {
     },
     handleEdit(index, row) {
       console.log(index, row);
-       this.$router.push({ path: 'editterminal' });
+      this.$router.push({ path: 'editterminal', query: row});
     },
     handleDelete(index, row) {
       console.log(index, row);

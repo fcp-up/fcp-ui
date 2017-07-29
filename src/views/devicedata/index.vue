@@ -58,7 +58,7 @@
 </style>
 
 <script>
-import {getList} from '../../api/article';
+import {getList} from 'api/article';
 export default {
   data() {
     return {

@@ -9,7 +9,7 @@
 <script>
 import normalMarker from '../../assets/marker/normal.png';
 import alarmMarker from '../../assets/marker/alarm.png';
-import { fetchMarkers } from '../../api/monitor';
+import { fetchMarkers } from 'api/monitor';
 export default {
   data() {
     return {
