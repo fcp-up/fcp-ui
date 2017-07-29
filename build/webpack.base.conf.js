@@ -10,7 +10,7 @@ var src = path.resolve(__dirname, '../src');
 
 module.exports = {
     entry: {
-        app: './src/main.js'
+        app: ["babel-polyfill", "./src/main.js"]
     },
     output: {
         path: config.build.assetsRoot,
@@ -37,8 +37,7 @@ module.exports = {
         }
     },
     externals: {
-        jquery: 'jQuery',
-        AMap: 'AMap'
+        jquery: 'jQuery'
     },
     module: {
         rules: [
