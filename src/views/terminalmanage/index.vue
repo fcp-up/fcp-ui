@@ -57,7 +57,7 @@
 </style>
 
 <script>
-import {getList} from '../../api/article';
+import {getTerminalList} from '../../api/terminal';
 export default {
   data() {
     return {
@@ -103,7 +103,7 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList(this.listQuery).then(response => {
+      getTerminalList().then(response => {
         this.list = response.data;
         this.listLoading = false;
       })
