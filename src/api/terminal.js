@@ -13,7 +13,7 @@ export function saveTerminal(terminal) {
   };
   return fetch({
     url: '/fcp/terminal',
-    method: 'post',
+    method: 'get',
     params: terminalInfo
   });
 }
