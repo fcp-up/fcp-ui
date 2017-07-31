@@ -33,6 +33,9 @@ const TerminalManage = _import('terminalmanage/index');
 /* editterminal */
 const EditTerminal = _import('terminalmanage/editterminal');
 
+/* editterminal */
+const AddTerminal = _import('terminalmanage/addterminal');
+
 /* error page */
 const Err404 = _import('error/404');
 const Err401 = _import('error/401');
@@ -105,6 +108,7 @@ export const asyncRouterMap = [
     icon: 'theme',
     noDropdown: true,
     children: [{ path: 'index', component: TerminalManage, name: '终端管理' },
-      { path: 'editterminal', component: EditTerminal, name: '编辑终端', hidden: true }]
+      { path: 'editterminal', component: EditTerminal, name: '编辑终端', hidden: true },
+      { path: 'addterminal', component: AddTerminal, name: '新增终端', hidden: true }]
   }, { path: '*', redirect: '/404', hidden: true }
 ];

@@ -6,3 +6,14 @@ export function getTerminalList() {
     method: 'get'
   });
 }
+
+export function saveTerminal(terminal) {
+  const terminalInfo = {
+    params: JSON.stringify(terminal)
+  };
+  return fetch({
+    url: '/fcp/terminal',
+    method: 'post',
+    params: terminalInfo
+  });
+}

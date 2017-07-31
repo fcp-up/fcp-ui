@@ -34,7 +34,11 @@ VueAMap.initAMapApiLoader({
   // 高德的key
   key: '3a4440897eafbd61c4270072b8580542',
   // 插件集合
-  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor']
+  plugin: [
+    'AMap.Autocomplete',
+    'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView',
+    'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor',
+    'AMap.CircleEditor', 'AMap.Geocoder']
 });
 
 // register global utility filters.
