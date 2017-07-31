@@ -18,11 +18,11 @@
         </el-table-column>
         <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column>
-        <el-table-column prop="name" label="终端名称" width="150">
-        </el-table-column>
+        <!-- <el-table-column prop="name" label="终端名称" width="150">
+        </el-table-column>  -->
          <!-- <el-table-column prop="alarmPhone" label="报警电话" width="300">  
         </el-table-column>          -->
-        <el-table-column prop="alarmPhone" label="报警电话" width="250">
+        <el-table-column prop="alarmPhone" label="报警电话" width="300">
         </el-table-column> 
         <el-table-column prop="address" label="安装地址" width="300">
         </el-table-column>
@@ -84,9 +84,7 @@ export default {
     fetchData() {
       this.listLoading = true;
       getTerminalList().then(response => {
-        console.log(response.data);
        let res = response.data;
-       console.log(res);
         if(res.code == 0) {
           this.list = res.data;
         }else{
@@ -100,8 +98,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['序号', '文章标题', '作者', '阅读数', '发布时间'];
-        const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time'];
+        const tHeader = ['终端编号', '报警电话', '安装地址'];
+        const filterVal = ['no', 'alarmPhone', 'address'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');
@@ -111,7 +109,7 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
     handleSizeChange(val) {
-       console.log(`每页 ${val} 条`);
+       console.log(`每页 ${val} 条`);  
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);

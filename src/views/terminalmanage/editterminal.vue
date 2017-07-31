@@ -19,7 +19,10 @@
             <el-input v-model="terminal.address"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="large" @click="onSubmit">保存</el-button>
+            <div class='tips'>{{tips}}</div>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" size="large" @click="saveTerminalInfo_AlarmPhone">保存</el-button>
             <el-button size="large" @click="cancel">取消</el-button>
           </el-form-item>
         </el-form>
@@ -29,8 +32,7 @@
           <el-amap :vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
             <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
           </el-amap>
-        </div>
-  
+        </div>  
       </el-col>
     </el-row>
   </div>
@@ -40,6 +42,11 @@
 .el-form {
   margin-top: 15px;
 }
+
+.tips {
+    font-size: 14px;
+    color: red;
+  }
 
 .mapzone {
   width: 80%;
@@ -61,11 +68,12 @@
 
 
 <script>
-import {saveTerminal} from 'api/terminal';
+import {saveTerminal,saveTerminalAlarmPhone} from 'api/terminal';
 export default {
   data() {
     let self = this;
     return {
+      tips: '',
       terminal: {
         no: '',
         name: '',
@@ -112,7 +120,7 @@ export default {
     this.terminal.latitude = curTerminal.latitude || '';
     this.terminal.longitude = curTerminal.longitude || '';
     this.terminal.adminDivNo = curTerminal.adminDivNo || '';
-    this.terminal.alarmPhoneNo = curTerminal.alarmPhoneNo || '';
+    this.terminal.alarmPhoneNo = curTerminal.alarmPhone || '';
     this.terminal.address = curTerminal.address || '';
     if (this.terminal.latitude && this.terminal.longitude) {
       this.markers.push({ position: [this.terminal.longitude] })
@@ -123,14 +131,26 @@ export default {
     }
   },
   methods: {
-    onSubmit() {
+    saveTerminalInfo() {
       saveTerminal(this.terminal).then(response => {
        let res = response.data;
-       console.log(res);
         if(res.code == 0) {
-          console.log('获取终端存储成功.');
+          this.tips = '终端信息编辑存储成功.'
+          this.$router.go(-1);
         }else{
-          console.log('获取终端存储失败.');
+          this.tips = '终端信息编辑存储失败.'
+        }
+        this.listLoading = false;
+      })
+    },
+    saveTerminalInfo_AlarmPhone() {
+      saveTerminalAlarmPhone(this.terminal).then(response => {
+       let res = response.data;
+        if(res.code == 0) {
+          this.tips = '终端报警电话编辑存储成功.'
+          this.$router.go(-1);
+        }else{
+          this.tips = '终端报警电话编辑存储失败.'
         }
         this.listLoading = false;
       })
