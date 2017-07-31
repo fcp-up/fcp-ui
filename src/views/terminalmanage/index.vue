@@ -22,7 +22,7 @@
         </el-table-column>
          <!-- <el-table-column prop="alarmPhone" label="报警电话" width="300">  
         </el-table-column>          -->
-        <el-table-column prop="position" label="位置信息" width="250">
+        <el-table-column prop="alarmPhone" label="报警电话" width="250">
         </el-table-column> 
         <el-table-column prop="address" label="安装地址" width="300">
         </el-table-column>
@@ -36,7 +36,7 @@
     </el-row>
     <el-row>
       <div class="pagination">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[100, 200, 300, 400]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="400">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="pageSizes" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </div>
     </el-row>
@@ -44,8 +44,8 @@
 </template>
 
 <style scoped>
-.el-select {
-  width: 100px;
+.el-input {
+  width: 300px;
 }
 .el-form-item {
   margin-bottom: 0px;
@@ -59,7 +59,7 @@
 </style>
 
 <script>
-import {getTerminalList} from 'api/terminal';
+import {getTerminalList,saveTerminal} from 'api/terminal';
 export default {
   data() {
     return {
@@ -70,28 +70,11 @@ export default {
         no: ''
       },
       listLoading: true,
-      list: [{
-        no: '1234512345',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778'
-      }, {
-        no: '1231',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778'
-      }, {
-        no: '12311',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778'
-      }, {
-        no: '123111',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778'
-      }],
-      currentPage4: 4
+      list: [],
+      currentPage: 4,
+      pageSize: 10,
+      pageSizes: [10, 20, 30, 40, 50, 100],
+      total: 10
     };
   },
   created() {
@@ -101,7 +84,14 @@ export default {
     fetchData() {
       this.listLoading = true;
       getTerminalList().then(response => {
-        this.list = response.data;
+        console.log(response.data);
+       let res = response.data;
+       console.log(res);
+        if(res.code == 0) {
+          this.list = res.data;
+        }else{
+          console.log('获取终端列表失败.');
+        }
         this.listLoading = false;
       })
     },
@@ -130,11 +120,11 @@ export default {
       console.log("index, row");
     },
     onAdd() {
-      console.log("index, row");
+      this.$router.push({ path: 'editterminal' ,name: '新增终端'});
     },
     handleEdit(index, row) {
       console.log(index, row);
-      this.$router.push({ path: 'editterminal', query: row});
+      this.$router.push({ path: 'editterminal', query: { terminal: row} });
     },
     handleDelete(index, row) {
       console.log(index, row);
