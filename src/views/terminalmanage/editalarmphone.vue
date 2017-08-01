@@ -2,27 +2,27 @@
   <div class="app-container">
     <el-row>
       <el-col :xs="8" :sm="6" :md="4" :lg="8">
-        <el-form ref="form" :model="terminal" label-width="100px">
+        <el-form :model="terminal" :rules="terminalRules" ref="terminalForm" label-width="100px">
           <el-form-item label="终端编号">
-            <el-input v-model="terminal.no"></el-input>
+            <el-input v-model="terminal.no" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="位置经度">
-            <el-input v-model="terminal.longitude"></el-input>
+            <el-input v-model="terminal.longitude" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="位置纬度">
-            <el-input v-model="terminal.latitude"></el-input>
+            <el-input v-model="terminal.latitude" :disabled="true"></el-input>
           </el-form-item>
-          <!-- <el-form-item label="报警电话">
-            <el-input v-model="terminal.alarmPhoneNo"></el-input>
-          </el-form-item> -->
+          <el-form-item prop="alarmPhoneNo" label="报警电话">
+            <el-input name="alarmPhoneNo" v-model="terminal.alarmPhoneNo"></el-input>
+          </el-form-item>
           <el-form-item label="安装地址">
-            <el-input v-model="terminal.address"></el-input>
+            <el-input v-model="terminal.address" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item>
             <div class='tips'>{{tips}}</div>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="large" @click="saveTerminalInfo">保存</el-button>
+            <el-button type="primary" size="large" @click="submitForm('terminalForm')">保存</el-button>
             <el-button size="large" @click="cancel">取消</el-button>
           </el-form-item>
         </el-form>
@@ -32,7 +32,7 @@
           <el-amap :vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
             <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
           </el-amap>
-        </div>  
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -44,13 +44,13 @@
 }
 
 .tips {
-    font-size: 14px;
-    color: red;
-  }
+  font-size: 14px;
+  color: red;
+}
 
 .mapzone {
   width: 80%;
-  height: 220px;
+  height: 270px;
   margin: 15px 15px 15px 15px;
 }
 
@@ -68,10 +68,18 @@
 
 
 <script>
-import {saveTerminal} from 'api/terminal';
+import { saveTerminal, saveTerminalAlarmPhone } from 'api/terminal';
+import { visWsPhoneNo } from 'utils/validate';
 export default {
   data() {
     let self = this;
+    const validatePhoneNo = (rule, value, callback) => {
+      if (!visWsPhoneNo(value)) {
+        callback(new Error('请输入正确的合法手机号'));
+      } else {
+        callback();
+      }
+    };
     return {
       tips: '',
       terminal: {
@@ -83,6 +91,11 @@ export default {
         alarmPhoneNo: '',
         address: ''
       },
+      terminalRules: {
+        alarmPhoneNo: [
+          { required: true, trigger: 'blur', validator: validatePhoneNo }
+        ]
+      },
       zoom: 14,
       center: [102.82756, 24.943165],
       markers: [],
@@ -93,7 +106,7 @@ export default {
           self.terminal.longitude = lng;
           self.terminal.latitude = lat;
           self.marker = { lng, lat };
-          self.changePosition([lng,lat]);
+          self.changePosition([lng, lat]);
           // 这里通过高德 SDK 完成。
           var geocoder = new AMap.Geocoder({
             radius: 1000,
@@ -131,24 +144,31 @@ export default {
     }
   },
   methods: {
-    saveTerminalInfo() {
-      saveTerminal(this.terminal).then(response => {
-       let res = response.data;
-        if(res.code == 0) {
-          this.tips = '终端信息编辑存储成功.'
-          this.$router.go(-1);
-        }else{
-          this.tips = '终端信息编辑存储失败.'
+    submitForm(terminalForm) {
+      this.$refs[terminalForm].validate(valid => {
+        if (valid) {
+          saveTerminalAlarmPhone(this.terminal).then(response => {
+            let res = response.data;
+            if (res.code == 0) {
+              this.tips = '终端报警电话编辑存储成功.'
+              this.$router.go(-1);
+            } else {
+              this.tips = '终端报警电话编辑存储失败.'
+            }
+            this.listLoading = false;
+          })
+        } else {
+          console.log('error submit!!');
+          return false;
         }
-        this.listLoading = false;
-      })
+      });
     },
     cancel() {
       this.$router.go(-1)
     },
     changePosition(position) {
-          this.markers[0].position = position;
-        }
+      this.markers[0].position = position;
+    }
 
   }
 };

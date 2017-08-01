@@ -8,6 +8,7 @@ export function getTerminalList() {
 }
 
 export function saveTerminal(terminal) {
+  console.log(terminal);
   const terminalInfo = {
     params: JSON.stringify(terminal)
   };
@@ -28,7 +29,7 @@ export function saveTerminalAlarmPhone(terminal) {
   };
   return fetch({
     url: '/fcp/terminal/alarmPhone',
-    method: 'post',
+    method: 'put',
     params: terminalInfo
   });
 }

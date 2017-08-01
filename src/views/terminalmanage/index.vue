@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">     
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
           <el-input v-model="formInline.terminalNo" placeholder="输入终端编号或名称关键词检索"></el-input>
         </el-form-item>
@@ -19,24 +19,23 @@
         <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column>
         <!-- <el-table-column prop="name" label="终端名称" width="150">
-        </el-table-column>  -->
-         <!-- <el-table-column prop="alarmPhone" label="报警电话" width="300">  
-        </el-table-column>          -->
+          </el-table-column>  -->
         <el-table-column prop="alarmPhone" label="报警电话" width="300">
-        </el-table-column> 
+        </el-table-column>
         <el-table-column prop="address" label="安装地址" width="300">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
             <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
             <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" type="info" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">设置报警电话</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagination">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="pageSizes" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <div class="pagetoolbar" v-if="total" >
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="10" layout="total, prev, pager, next" :total="total">
         </el-pagination>
       </div>
     </el-row>
@@ -47,19 +46,22 @@
 .el-input {
   width: 300px;
 }
+
 .el-form-item {
   margin-bottom: 0px;
 }
+
 .el-table-column {
-  white-space: nowrap;            
+  white-space: nowrap;
 }
-.pagination {
-  margin:0 auto
+
+.pagetoolbar {
+  text-align: center;
 }
 </style>
 
 <script>
-import {getTerminalList,saveTerminal} from 'api/terminal';
+import { getTerminalList, saveTerminal } from 'api/terminal';
 export default {
   data() {
     return {
@@ -71,10 +73,8 @@ export default {
       },
       listLoading: true,
       list: [],
-      currentPage: 4,
-      pageSize: 10,
-      pageSizes: [10, 20, 30, 40, 50, 100],
-      total: 10
+      currentPage: '',
+      total: 0
     };
   },
   created() {
@@ -84,10 +84,12 @@ export default {
     fetchData() {
       this.listLoading = true;
       getTerminalList().then(response => {
-       let res = response.data;
-        if(res.code == 0) {
+        let res = response.data;
+        if (res.code == 0) {
           this.list = res.data;
-        }else{
+          this.total = res.data.length;
+          this.currentPage = 1;
+        } else {
           console.log('获取终端列表失败.');
         }
         this.listLoading = false;
@@ -109,7 +111,7 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
     handleSizeChange(val) {
-       console.log(`每页 ${val} 条`);  
+      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
@@ -118,11 +120,15 @@ export default {
       console.log("index, row");
     },
     onAdd() {
-      this.$router.push({ path: 'editterminal' ,name: '新增终端'});
+      this.$router.push({ path: 'addterminal' });
     },
     handleEdit(index, row) {
       console.log(index, row);
-      this.$router.push({ path: 'editterminal', query: { terminal: row} });
+      this.$router.push({ path: 'editterminal', query: { terminal: row } });
+    },
+    handleAlarmPhoneEdit(index, row) {
+      console.log(index, row);
+      this.$router.push({ path: 'setterminalalarmphone', query: { terminal: row } });
     },
     handleDelete(index, row) {
       console.log(index, row);

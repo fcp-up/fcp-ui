@@ -26,6 +26,12 @@ export function validateLowerCase(str) {
 //     return reg.test(str);
 // }
 
+/* 手机号 */
+export function visWsPhoneNo(str) {
+  const reg = /^((13|15|18)\d{9}\,)*(13|15|18)\d{9}$/;
+  return reg.test(str);
+}
+
 /* 大写字母*/
 export function validateUpperCase(str) {
   const reg = /^[A-Z]+$/;
