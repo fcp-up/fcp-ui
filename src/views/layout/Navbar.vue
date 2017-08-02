@@ -2,7 +2,7 @@
 	<el-menu class="navbar" mode="horizontal">
 		<hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
 		<levelbar></levelbar>
-		<tabs-view></tabs-view>
+		<!-- <tabs-view></tabs-view> -->
 		<error-log v-if="log.length>0" class="errLog-container" :logsList="log"></error-log>
 		<screenfull class='screenfull'></screenfull>
 		<div style="float:right;margin-right:15px;"><el-button  type="text" @click="logout">退出登录</el-button></div>		
