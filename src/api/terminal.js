@@ -7,15 +7,22 @@ export function getTerminalList() {
   });
 }
 
-export function saveTerminal(terminal) {
-  console.log(terminal);
-  const terminalInfo = {
-    params: JSON.stringify(terminal)
-  };
+
+export function saveTerminal(oldValue, newValue) {
+  const updateparams = {
+    tag: oldValue,
+    obj: newValue
+  }
+  const postparams = new URLSearchParams();
+  postparams.append('params', JSON.stringify(updateparams));
+  postparams.append('_method', 'put');
   return fetch({
     url: '/fcp/terminal',
-    method: 'put',
-    params: terminalInfo
+    method: 'post',
+    data: postparams,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   });
 }
 
