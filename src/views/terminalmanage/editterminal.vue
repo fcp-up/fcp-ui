@@ -95,19 +95,19 @@ export default {
           self.marker = { lng, lat };
           self.changePosition([lng,lat]);
           // 这里通过高德 SDK 完成。
-          var geocoder = new AMap.Geocoder({
-            radius: 1000,
-            extensions: "all"
-          });
-          geocoder.getAddress([lng, lat], function (status, result) {
-            if (status === 'complete' && result.info === 'OK') {
-              if (result && result.regeocode) {
-                self.terminal.address = result.regeocode.formattedAddress;
-                self.terminal.adminDivNo = result.regeocode.formattedAddress;
-                self.$nextTick();
-              }
-            }
-          });
+          // var geocoder = new AMap.Geocoder({
+          //   radius: 1000,
+          //   extensions: "all"
+          // });
+          // geocoder.getAddress([lng, lat], function (status, result) {
+          //   if (status === 'complete' && result.info === 'OK') {
+          //     if (result && result.regeocode) {
+          //       self.terminal.address = result.regeocode.formattedAddress;
+          //       //self.terminal.adminDivNo = result.regeocode.formattedAddress;
+          //       self.$nextTick();
+          //     }
+          //   }
+          // });
         }
       },
     };
@@ -119,8 +119,8 @@ export default {
     this.terminal.no = curTerminal.no || '';
     this.terminal.latitude = curTerminal.latitude || '';
     this.terminal.longitude = curTerminal.longitude || '';
-    this.terminal.adminDivNo = curTerminal.adminDivNo || '';
-    this.terminal.alarmPhoneNo = curTerminal.alarmPhone || '';
+    //this.terminal.adminDivNo = curTerminal.adminDivNo || '';
+    this.terminal.alarmPhone = curTerminal.alarmPhone || '';
     this.terminal.address = curTerminal.address || '';
     if (this.terminal.latitude && this.terminal.longitude) {
       this.markers.push({ position: [this.terminal.longitude] })
@@ -132,7 +132,11 @@ export default {
   },
   methods: {
     saveTerminalInfo() {
-      saveTerminal(this.terminal).then(response => {
+      // {"tag":{"no":"1"},"obj":{"longitude":"102.819979","latitude":"24.944099","alarmPhone":"1","address":"33333中","name":"终端--1"}}
+      let tags = {
+        no: this.terminal.no
+      }
+      saveTerminal(tags,this.terminal).then(response => {
        let res = response.data;
         if(res.code == 0) {
           this.tips = '终端信息编辑存储成功.'

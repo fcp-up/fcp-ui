@@ -17,17 +17,19 @@
         <el-table-column type="index" label="序号" width="80">
         </el-table-column>
         <el-table-column prop="no" label="终端编号" width="120">
-        </el-table-column>
-        <!-- <el-table-column prop="name" label="终端名称" width="150">
-          </el-table-column>  -->
+        </el-table-column >
         <el-table-column prop="alarmPhone" label="报警电话" width="300">
         </el-table-column>
+        <el-table-column prop="longitude" label="位置经度" width="120">
+        </el-table-column >
+        <el-table-column prop="latitude" label="位置纬度" width="120">
+        </el-table-column >
         <el-table-column prop="address" label="安装地址" width="300">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
             <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <!-- <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
             <el-button size="small" type="info" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">设置报警电话</el-button>
           </template>
         </el-table-column>

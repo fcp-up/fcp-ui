@@ -7,7 +7,6 @@ export function getTerminalList() {
   });
 }
 
-
 export function saveTerminal(oldValue, newValue) {
   const updateparams = {
     tag: oldValue,
@@ -16,6 +15,19 @@ export function saveTerminal(oldValue, newValue) {
   const postparams = new URLSearchParams();
   postparams.append('params', JSON.stringify(updateparams));
   postparams.append('_method', 'put');
+  return fetch({
+    url: '/fcp/terminal',
+    method: 'post',
+    data: postparams,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
+
+export function addTerminal(terminal) {
+  const postparams = new URLSearchParams();
+  postparams.append('params', JSON.stringify(terminal));
   return fetch({
     url: '/fcp/terminal',
     method: 'post',
