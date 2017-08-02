@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">     
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
-          <el-input v-model="formInline.terminalNo" placeholder="输入终端编号或名称关键词检索"></el-input>
+          <el-input v-model="formInline.queryStr" placeholder="输入设备编号或名称关键词检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
@@ -13,28 +13,31 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="no" label="设备编号" width="120">
+      <el-table :data="list" border style="width: 100%">
+         <!-- <el-table-column type="index" label="序号" width="80">
+        </el-table-column>  -->
+        <el-table-column prop="no" label="设备编号" width="120" fixed>
+        </el-table-column >
+        <el-table-column prop="address" label="安装地址" width="400">
         </el-table-column>
-        <el-table-column prop="name" label="设备名称" width="150">
-        </el-table-column>
-        <el-table-column prop="alarmPhone" label="报警电话" width="300">  
-        </el-table-column>         
-        <!-- <el-table-column prop="position" label="位置信息" width="150">
-        </el-table-column> -->
-        <el-table-column prop="address" label="安装地址" width="300">
-        </el-table-column>
-        <el-table-column label="操作">
+         <el-table-column prop="terminalNo" label="终端编号" width="120">
+        </el-table-column >         
+         <el-table-column prop="longitude" label="位置经度" width="150">
+        </el-table-column >
+        <el-table-column prop="latitude" label="位置纬度" width="150">
+        </el-table-column > 
+        <el-table-column prop="name" label="设备名称" width="280">
+        </el-table-column >
+        <el-table-column label="操作" width="220" fixed="right">
           <template scope="scope">
-            <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>            
           </template>
         </el-table-column>
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagination">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[100, 200, 300, 400]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="400">
+      <div class="pagetoolbar" v-if="total" >
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="10" layout="total, prev, pager, next" :total="total">
         </el-pagination>
       </div>
     </el-row>
@@ -42,59 +45,35 @@
 </template>
 
 <style scoped>
-.el-select {
-  width: 100px;
+.el-input {
+  width: 300px;
 }
+
 .el-form-item {
   margin-bottom: 0px;
 }
+
 .el-table-column {
-  white-space: nowrap;            
+  white-space: nowrap;
 }
-.pagination {
-  margin:0 auto
+
+.pagetoolbar {
+  text-align: center;
 }
 </style>
 
 <script>
-import {getList} from 'api/article';
+import { getDeviceList} from 'api/device';
 export default {
   data() {
     return {
       formInline: {
-        dateValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-        states: [{ 'label': '全部', value: -1 }, { 'label': '在线', value: 1 }, { 'label': '离线', value: 0 }],
-        currentState: -1,
-        terminalNo: ''
+        queryStr: ''
       },
-      list: null,
       listLoading: true,
-      tableData: [{
-        no: '1234512345',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
-      }, {
-        no: '1231',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
-      }, {
-        no: '12311',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
-      }, {
-        no: '123111',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        position: '102.00000111,73.000011116778',
-        alarmPhone: '13500000000'
-      }],
-      currentPage4: 4
+      list: [],
+      currentPage: '',
+      total: 0
     };
   },
   created() {
@@ -103,8 +82,15 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList(this.listQuery).then(response => {
-        this.list = response.data;
+      getDeviceList().then(response => {
+        let res = response.data;
+        if (res.code == 0) {
+          this.list = res.data;
+          this.total = res.data.length;
+          this.currentPage = 1;
+        } else {
+          console.log('获取终端列表失败.');
+        }
         this.listLoading = false;
       })
     },
@@ -113,8 +99,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['序号', '文章标题', '作者', '阅读数', '发布时间'];
-        const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time'];
+        const tHeader = ['设备编号', '设备名称','终端编号','安装地址'];
+        const filterVal = ['no', 'name', 'terminalNo', 'address'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');
@@ -124,7 +110,7 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
     handleSizeChange(val) {
-       console.log(`每页 ${val} 条`);
+      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
@@ -133,11 +119,11 @@ export default {
       console.log("index, row");
     },
     onAdd() {
-      console.log("index, row");
+      this.$router.push({ path: 'adddevice' });
     },
     handleEdit(index, row) {
       console.log(index, row);
-      this.$router.push({ path: 'editdevice' });
+      this.$router.push({ path: 'editdevice', query: { device: row } });
     },
     handleDelete(index, row) {
       console.log(index, row);

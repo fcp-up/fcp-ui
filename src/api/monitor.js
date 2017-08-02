@@ -1,8 +1,8 @@
 import fetch from 'utils/fetch';
 
-export function fetchMarkers() {
+export function fetchDeviceList() {
   return fetch({
-    url: '/test/marker.json',
+    url: '/fcp/terminal/list',
     method: 'get'
   });
 }

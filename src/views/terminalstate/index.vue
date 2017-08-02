@@ -18,7 +18,6 @@
         <el-form-item>
           <el-button type="primary" @click="onQuery">查询</el-button>
           <el-button style='margin-bottom:20px;float:right' type="primary" icon="document" @click="handleDownload">导出excel</el-button>
-          <el-button type="primary" @click="onAdd">新增</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -26,18 +25,15 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column>
-        <el-table-column prop="alarmPhone" label="报警电话" width="200">
-        </el-table-column>
+        <el-table-column prop="alarmPhone" label="报警电话" width="360">
+        </el-table-column>        
         <el-table-column prop="state" label="当前状态" width="100">
+        </el-table-column>
+        <el-table-column prop="terminalSignal" label="信号强度" width="100">
         </el-table-column>
         <el-table-column prop="date" label="状态时间" width="180">
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="320">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template scope="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>            
-          </template>
+        <el-table-column prop="address" label="安装地址" width="360">
         </el-table-column>
       </el-table>
     </el-row>
@@ -58,7 +54,7 @@
   margin-bottom: 0px;
 }
 .pagination {
-  margin:0 auto
+  text-align: center;
 }
 </style>
 

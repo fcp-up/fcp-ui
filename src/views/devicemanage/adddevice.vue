@@ -9,9 +9,6 @@
           <el-form-item label="安装地址">
             <el-input v-model="device.address"></el-input>
           </el-form-item>
-          <el-form-item label="终端编号">
-            <el-input v-model="device.terminalNo" :disabled="true"></el-input>
-          </el-form-item>  
           <el-form-item label="位置经度">
             <el-input v-model="device.longitude"></el-input>
           </el-form-item>
@@ -56,7 +53,7 @@
 
 .mapzone {
   width: 80%;
-  height: 330px;
+  height: 270px;
   margin: 15px 15px 15px 15px;
 }
 
@@ -74,7 +71,7 @@
 
 
 <script>
-import { saveDevice } from 'api/device';
+import { addDevice } from 'api/device';
 export default {
   data() {
     let self = this;
@@ -85,8 +82,8 @@ export default {
         name: '',
         longitude: '',
         latitude: '',
-        terminalNo: '',
-        address: ''
+        address: '',
+        terminalNo: '0'
       },
       zoom: 14,
       center: [102.82756, 24.943165],
@@ -108,7 +105,6 @@ export default {
             if (status === 'complete' && result.info === 'OK') {
               if (result && result.regeocode) {
                 self.device.address = result.regeocode.formattedAddress;
-                //self.terminal.adminDivNo = result.regeocode.formattedAddress;
                 self.$nextTick();
               }
             }
@@ -117,35 +113,16 @@ export default {
       },
     };
   },
-  created() {
-    let curDevice = this.$route.query.device;
-    this.device.no = curDevice.no || '';
-    this.device.name = curDevice.name || '';
-    this.device.terminalNo = curDevice.terminalNo || '';
-    this.device.latitude = curDevice.latitude || '';
-    this.device.longitude = curDevice.longitude || '';
-    this.device.address = curDevice.address || '';
-    if (this.device.latitude && this.device.longitude) {
-      this.markers.push({ position: [this.device.longitude, this.device.latitude] })
-    } else {
-      this.markers.push({ position: this.center });
-      this.device.longitude = this.center[0];
-      this.device.latitude = this.center[1];
-    }
-  },
+  created() { },
   methods: {
     saveDeviceInfo() {
-      // {"tag":{"no":"1"},"obj":{"longitude":"102.819979","latitude":"24.944099","alarmPhone":"1","address":"33333中","name":"终端--1"}}
-      let tags = {
-        no: this.device.no
-      }
-      saveDevice(tags, this.device).then(response => {
+      addDevice(this.device).then(response => {
         let res = response.data;
         if (res.code == 0) {
-          this.tips = '设备信息编辑存储成功.'
+          this.tips = '设备信息新增存储成功.'
           this.$router.go(-1);
         } else {
-          this.tips = '设备信息编辑存储失败.'
+          this.tips = '设备信息新增存储失败.'
         }
         this.listLoading = false;
       })

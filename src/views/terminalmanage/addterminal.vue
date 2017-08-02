@@ -95,19 +95,19 @@ export default {
           self.marker = { lng, lat };
           self.changePosition([lng, lat]);
           // // 这里通过高德 SDK 完成。
-          // var geocoder = new AMap.Geocoder({
-          //   radius: 1000,
-          //   extensions: "all"
-          // });
-          // geocoder.getAddress([lng, lat], function (status, result) {
-          //   if (status === 'complete' && result.info === 'OK') {
-          //     if (result && result.regeocode) {
-          //       self.terminal.address = result.regeocode.formattedAddress;
-          //       //self.terminal.adminDivNo = result.regeocode.formattedAddress;
-          //       self.$nextTick();
-          //     }
-          //   }
-          // });
+          var geocoder = new AMap.Geocoder({
+            radius: 1000,
+            extensions: "all"
+          });
+          geocoder.getAddress([lng, lat], function (status, result) {
+            if (status === 'complete' && result.info === 'OK') {
+              if (result && result.regeocode) {
+                self.terminal.address = result.regeocode.formattedAddress;
+                //self.terminal.adminDivNo = result.regeocode.formattedAddress;
+                self.$nextTick();
+              }
+            }
+          });
         }
       },
     };
@@ -118,10 +118,10 @@ export default {
       addTerminal(this.terminal).then(response => {
         let res = response.data;
         if (res.code == 0) {
-          this.tips = '终端信息编辑存储成功.'
+          this.tips = '终端信息新增存储成功.'
           this.$router.go(-1);
         } else {
-          this.tips = '终端信息编辑存储失败.'
+          this.tips = '终端信息新增存储失败.'
         }
         this.listLoading = false;
       })

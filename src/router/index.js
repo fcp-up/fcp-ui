@@ -24,6 +24,9 @@ const DeviceManage = _import('devicemanage/index');
 /* editdevice */
 const EditDevice = _import('devicemanage/editdevice');
 
+/* adddevice */
+const AddDevice = _import('devicemanage/adddevice');
+
 /* terminalstate */
 const TerminalState = _import('terminalstate/index');
 
@@ -103,7 +106,8 @@ export const asyncRouterMap = [
     icon: 'device',
     noDropdown: true,
     children: [{ path: 'index', component: DeviceManage, name: '设备管理' },
-      { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true }]
+      { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true },
+      { path: 'adddevice', component: AddDevice, name: '新增设备', hidden: true }]
   }, {
     path: '/terminalmanage',
     component: Layout,
