@@ -79,28 +79,28 @@ export const asyncRouterMap = [
     path: '/terminalstate',
     component: Layout,
     redirect: 'noredirect',
-    icon: 'bug',
+    icon: 'state',
     noDropdown: true,
     children: [{ path: 'terminalstate', component: TerminalState, name: '终端状态' }]
   }, {
     path: '/devicedata',
     component: Layout,
     redirect: 'noredirect',
-    icon: 'EXCEL',
+    icon: 'device-data',
     noDropdown: true,
     children: [{ path: 'devicedata', component: DeviceData, name: '设备数据' }]
   }, {
     path: '/devicealarmdata',
     component: Layout,
     redirect: 'noredirect',
-    icon: 'theme',
+    icon: 'log',
     noDropdown: true,
     children: [{ path: 'devicealarmdata', component: DeviceAlarmData, name: '报警日志' }]
   }, {
     path: '/devicemanage',
     component: Layout,
     redirect: '/devicemanage/index',
-    icon: 'theme',
+    icon: 'device',
     noDropdown: true,
     children: [{ path: 'index', component: DeviceManage, name: '设备管理' },
       { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true }]
@@ -108,7 +108,7 @@ export const asyncRouterMap = [
     path: '/terminalmanage',
     component: Layout,
     redirect: '/terminalmanage/index',
-    icon: 'theme',
+    icon: 'terminal',
     noDropdown: true,
     children: [{ path: 'index', component: TerminalManage, name: '终端管理' },
       { path: 'editterminal', component: EditTerminal, name: '编辑终端', hidden: true },

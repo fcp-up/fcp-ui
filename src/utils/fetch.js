@@ -6,9 +6,11 @@ import store from '../store';
 // 创建axios实例
 const service = axios.create({
   // baseURL: process.env.BASE_API, // api的base_url
-  baseURL: 'api',
+  // baseURL: 'api',
   timeout: 5000                  // 请求超时时间
 });
+
+// instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 // request拦截器
 service.interceptors.request.use(config => {
