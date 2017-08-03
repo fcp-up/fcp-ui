@@ -16,18 +16,22 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="no" label="设备编号" width="120">
+      <el-table :data="list" style="width: 100%">
+        <el-table-column prop="no" label="设备编号" width="120" fixed="left">
         </el-table-column>
-        <el-table-column prop="alarmPhone" label="报警电话" width="200">
+        <el-table-column prop="terminalNo" label="设备编号" width="120">
         </el-table-column>
-         <el-table-column prop="state" label="电池电压" width="100">
+        <el-table-column prop="address" label="安装地址" width="360">
         </el-table-column>
-        <el-table-column prop="state" label="信号强度" width="100">
+        <el-table-column prop="lastAlarmTime" label="报警时间" width="180">
         </el-table-column>
-        <el-table-column prop="date" label="报警时间" width="120">
+        <el-table-column prop="state" label="电池电压" width="100">
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="300">
+        <el-table-column prop="lastSignal" label="信号强度" width="100">
+        </el-table-column>
+        <el-table-column prop="longitude" label="位置经度" width="180">
+        </el-table-column>
+        <el-table-column prop="latitude" label="位置维度" width="180">
         </el-table-column>
       </el-table>
     </el-row>
@@ -44,16 +48,18 @@
 .el-select {
   width: 100px;
 }
+
 .el-form-item {
   margin-bottom: 0px;
 }
+
 .pagination {
   text-align: center;
 }
 </style>
 
 <script>
-import {getList} from 'api/article';
+import { getDeviceList } from 'api/device';
 export default {
   data() {
     return {
@@ -65,35 +71,6 @@ export default {
       },
       list: null,
       listLoading: true,
-      tableData: [{
-        no: '1234512345',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '1231',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '12311',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '123111',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }],
       currentPage4: 4
     };
   },
@@ -103,8 +80,13 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList(this.listQuery).then(response => {
-        this.list = response.data;
+      getDeviceList(this.listQuery).then(response => {
+        let res = response.data;
+        if (!res.code) {
+          this.list = res.data;
+        } else {
+          console.log('查询设备报警数据失败.');
+        }
         this.listLoading = false;
       })
     },
@@ -124,22 +106,13 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
     handleSizeChange(val) {
-       console.log(`每页 ${val} 条`);
+      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
     onQuery() {
       console.log("index, row");
-    },
-    onAdd() {
-      console.log("index, row");
-    },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
     }
   }
 };

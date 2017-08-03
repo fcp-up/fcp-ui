@@ -22,18 +22,22 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="no" label="终端编号" width="120">
+      <el-table :data="list" style="width: 100%">
+        <el-table-column prop="no" label="终端编号" width="120" fixed="left">
         </el-table-column>
+        <el-table-column prop="name" label="终端名称" width="300">
+        </el-table-column>        
         <el-table-column prop="alarmPhone" label="报警电话" width="360">
         </el-table-column>        
-        <el-table-column prop="state" label="当前状态" width="100">
+        <el-table-column prop="lastOnlineState" label="当前状态" width="100">
+           <template>{{ lastOnlineState == 1 ? '在线':'离线'}}</template>  
         </el-table-column>
-        <el-table-column prop="terminalSignal" label="信号强度" width="100">
+        <el-table-column prop="lastSignal" label="信号强度" width="100">
         </el-table-column>
-        <el-table-column prop="date" label="状态时间" width="180">
+        <el-table-column prop="lastOnlineTime" label="状态时间" width="180">
+          <!-- <template>{{formatTime(lastOnlineTime,'')}}</template> -->
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="360">
+        <el-table-column prop="address" label="安装地址" width="380">
         </el-table-column>
       </el-table>
     </el-row>
@@ -59,7 +63,8 @@
 </style>
 
 <script>
-import {getList} from 'api/article';
+import {getTerminalList} from 'api/terminal';
+import {formatTime} from 'utils/index';
 export default {
   data() {
     return {
@@ -70,36 +75,7 @@ export default {
         terminalNo: ''
       },
       list: null,
-      listLoading: true,
-      tableData: [{
-        no: '1234512345',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '1231',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '12311',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '123111',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }],
+      listLoading: true,      
       currentPage4: 4
     };
   },
@@ -109,8 +85,12 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList(this.listQuery).then(response => {
-        this.list = response.data;
+      getTerminalList(this.listQuery).then(response => {
+        if(!response.code){
+          this.list = response.data.data;
+        }else{
+          console.log('查询终端状态出错.');
+        }
         this.listLoading = false;
       })
     },
@@ -137,15 +117,6 @@ export default {
     },
     onQuery() {
       console.log("index, row");
-    },
-    onAdd() {
-      console.log("index, row");
-    },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
     }
   }
 };

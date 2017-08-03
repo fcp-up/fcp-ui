@@ -28,7 +28,7 @@
         </el-table-column > 
         <el-table-column prop="name" label="设备名称" width="280">
         </el-table-column >
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="100" fixed="right">
           <template scope="scope">
             <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>            
           </template>
@@ -84,6 +84,7 @@ export default {
       this.listLoading = true;
       getDeviceList().then(response => {
         let res = response.data;
+                console.log(res);
         if (res.code == 0) {
           this.list = res.data;
           this.total = res.data.length;
