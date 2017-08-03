@@ -16,22 +16,28 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="no" label="设备编号" width="120">
+      <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
+        fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
+        <el-table-column prop="no" label="设备编号" width="120" fixed="left">
+        </el-table-column>        
+        <el-table-column prop="name" label="设备名称" width="250" show-overflow-tooltip="true">
         </el-table-column>
-        <el-table-column prop="deviceSignal" label="信号强度" width="100">
+        <el-table-column prop="terminalNo" label="终端编号" width="120">
+        </el-table-column>
+        <el-table-column prop="address" label="安装位置" width="360" show-overflow-tooltip="true">
+        </el-table-column>
+        <el-table-column prop="signal" label="信号强度" width="100">
         </el-table-column> 
-        <el-table-column prop="state" label="电池电压" width="100">
+        <el-table-column prop="pressure" label="电池电压" width="100">
         </el-table-column>
-        <el-table-column prop="date" label="数据时间" width="120">
-        </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="300">
+        <el-table-column prop="time" label="数据时间" width="200" show-overflow-tooltip="true">
         </el-table-column>
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagination">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[100, 200, 300, 400]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="400">
+      <div class="pagination" v-if="page.total">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
+        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row>
@@ -51,7 +57,8 @@
 </style>
 
 <script>
-import {getList} from 'api/article';
+import { getDeviceList } from 'api/device';
+import { parseTime } from 'utils/index';
 export default {
   data() {
     return {
@@ -62,37 +69,13 @@ export default {
         terminalNo: ''
       },
       list: null,
-      listLoading: true,
-      tableData: [{
-        no: '1234512345',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '1231',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '12311',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }, {
-        no: '123111',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        state: '在线',
-        date: '2016-05-02',
-        alarmPhone: '13500000000'
-      }],
-      currentPage4: 4
+      listLoading: true, 
+      page: {
+        currentPage: null,
+        pageSize: 10,
+        total: null,
+        pageSizes: null
+      }
     };
   },
   created() {
@@ -101,8 +84,17 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList(this.listQuery).then(response => {
-        this.list = response.data;
+      getDeviceList(this.listQuery).then(response => {
+        let res = response.data;
+        if (res.code == 0){
+          this.list = res.data;
+          this.page.total = this.list.length;
+          this.list.forEach(function(item,index){
+            if(item.time){
+              this.list[index].time = item.date == undefined ? '' : parseTime(item.time) ; 
+            }
+          },this);
+        }
         this.listLoading = false;
       })
     },
@@ -111,8 +103,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['序号', '文章标题', '作者', '阅读数', '发布时间'];
-        const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time'];
+        const tHeader = ['设备编号', '设备名称', '安装地址', '信号强度', '电池电压'];
+        const filterVal = ['no', 'name', 'address', 'deviceSignal', '电池电压'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');
@@ -125,19 +117,8 @@ export default {
        console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    onQuery() {
-      console.log("index, row");
-    },
-    onAdd() {
-      console.log("index, row");
-    },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
+      this.page.currentPage = val;
+      this.fetchData();
     }
   }
 };

@@ -13,12 +13,13 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="list" border style="width: 100%">
+      <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
+        fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
          <!-- <el-table-column type="index" label="序号" width="80">
         </el-table-column>  -->
         <el-table-column prop="no" label="设备编号" width="120" fixed>
         </el-table-column >
-        <el-table-column prop="address" label="安装地址" width="400">
+        <el-table-column prop="address" label="安装地址" width="400" show-overflow-tooltip="true">
         </el-table-column>
          <el-table-column prop="terminalNo" label="终端编号" width="120">
         </el-table-column >         
@@ -26,7 +27,7 @@
         </el-table-column >
         <el-table-column prop="latitude" label="位置纬度" width="150">
         </el-table-column > 
-        <el-table-column prop="name" label="设备名称" width="280">
+        <el-table-column prop="name" label="设备名称" width="280" show-overflow-tooltip="true">
         </el-table-column >
         <el-table-column label="操作" width="100" fixed="right">
           <template scope="scope">
@@ -36,8 +37,9 @@
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagetoolbar" v-if="total" >
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :page-size="10" layout="total, prev, pager, next" :total="total">
+      <div class="pagination" v-if="page.total">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
+        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row>
@@ -57,7 +59,7 @@
   white-space: nowrap;
 }
 
-.pagetoolbar {
+.pagination {
   text-align: center;
 }
 </style>
@@ -70,10 +72,14 @@ export default {
       formInline: {
         queryStr: ''
       },
-      listLoading: true,
-      list: [],
-      currentPage: '',
-      total: 0
+      list: null,
+      listLoading: true, 
+      page: {
+        currentPage: null,
+        pageSize: 10,
+        total: null,
+        pageSizes: null
+      }
     };
   },
   created() {
@@ -88,7 +94,6 @@ export default {
         if (res.code == 0) {
           this.list = res.data;
           this.total = res.data.length;
-          this.currentPage = 1;
         } else {
           console.log('获取终端列表失败.');
         }
@@ -114,13 +119,8 @@ export default {
       console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    onQuery() {
-      console.log("index, row");
-    },
-    onAdd() {
-      this.$router.push({ path: 'adddevice' });
+      this.page.currentPage = val;
+      this.fetchData();
     },
     handleEdit(index, row) {
       console.log(index, row);

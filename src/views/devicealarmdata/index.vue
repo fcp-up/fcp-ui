@@ -16,14 +16,17 @@
       </el-form>
     </el-row>
     <el-row>
-      <el-table :data="list" style="width: 100%">
+      <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
+        fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
         <el-table-column prop="no" label="设备编号" width="120" fixed="left">
         </el-table-column>
-        <el-table-column prop="terminalNo" label="设备编号" width="120">
+        <el-table-column prop="name" label="设备名称" width="360" show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column prop="address" label="安装地址" width="360">
         </el-table-column>
-        <el-table-column prop="lastAlarmTime" label="报警时间" width="180">
+        <el-table-column prop="terminalNo" label="终端编号" width="120">
+        </el-table-column>
+        <el-table-column prop="time" label="报警时间" width="200" show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column prop="state" label="电池电压" width="100">
         </el-table-column>
@@ -36,8 +39,9 @@
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagination">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[100, 200, 300, 400]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="400">
+      <div class="pagination" v-if="page.total">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
+        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row>
@@ -60,6 +64,7 @@
 
 <script>
 import { getDeviceList } from 'api/device';
+import { parseTime } from 'utils/index';
 export default {
   data() {
     return {
@@ -70,8 +75,13 @@ export default {
         terminalNo: ''
       },
       list: null,
-      listLoading: true,
-      currentPage4: 4
+      listLoading: true, 
+      page: {
+        currentPage: null,
+        pageSize: 10,
+        total: null,
+        pageSizes: null
+      }
     };
   },
   created() {
@@ -82,10 +92,14 @@ export default {
       this.listLoading = true;
       getDeviceList(this.listQuery).then(response => {
         let res = response.data;
-        if (!res.code) {
+        if (res.code == 0){
           this.list = res.data;
-        } else {
-          console.log('查询设备报警数据失败.');
+          this.page.total = this.list.length;
+          this.list.forEach(function(item,index){
+            if(item.lastAlarmTime){
+              this.list[index].time = item.lastAlarmTime == undefined ? '' : parseTime(item.lastAlarmTime) ; 
+            }
+          },this);
         }
         this.listLoading = false;
       })
@@ -109,10 +123,8 @@ export default {
       console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    onQuery() {
-      console.log("index, row");
+      this.page.currentPage = val;
+      this.fetchData();
     }
   }
 };
