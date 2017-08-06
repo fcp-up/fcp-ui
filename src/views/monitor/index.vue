@@ -9,7 +9,12 @@
 <script>
 import normalMarker from '../../assets/marker/normal.png';
 import alarmMarker from '../../assets/marker/alarm.png';
+// import store from './store';
 import { fetchDeviceList } from 'api/monitor';
+import { mapGetters } from 'vuex';
+
+//const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
+// const ws = new WebSocket(url);
 
 const WSP = {
   ST: {
@@ -45,6 +50,11 @@ export default {
       loading: false
     }
   },
+  computed: {
+    ...mapGetters([
+      'sessionId'
+    ])
+  },
   methods: {
     getMarkers() {
       this.loading = true;
@@ -67,13 +77,16 @@ export default {
         }
         this.loading = false;
       })
-    }
-  },
-  socket: {
-    events: {
-      changed(msg) {
-        console.log("Something changed: " + msg);
-        var msg = eval('(' + msg + ')');
+    },
+    createWs() {
+      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
+      const ws = new WebSocket(url);
+      ws.onopen = function () {
+        // console.log('连接成功');
+      };
+      ws.onmessage = function (res) {
+        // res为接收到的数据
+        var msg = eval('(' + res.data + ')');
         switch (msg.type) {
           case WSP.MT.txt:
             msg = [msg.source.addr, '：', msg.msg, '<br>'].join('');
@@ -88,22 +101,58 @@ export default {
             msg = ['设备告警：', msg.msg, '<br>'].join('');
             break;
         }
-        console.log(msg);
-      },
-      connect() {
-        console.log("Websocket connected to " + this.$socket.nsp);
-      },
-
-      disconnect() {
-        console.log("Websocket disconnected from " + this.$socket.nsp);
-      },
-      error(err) {
-        console.error("Websocket error!", err);
+      };
+      ws.onerror = function (e) { // e为错误信息
+        console.log("WebSocket Error: ", e);
+      };
+      ws.onclose = function (e) { // e为关闭的原因
+        console.log("Connection closed", e);
+      };
+    },
+    getSessionId() {
+      if (!this.sessionId) {
+        this.$store.dispatch('GetSessionId').then(() => {
+          this.createWs();
+        })
       }
     }
   },
+  // socket: {
+  //   events: {
+  //     changed(msg) {
+  //       console.log("Something changed: " + msg);
+  //       var msg = eval('(' + msg + ')');
+  //       switch (msg.type) {
+  //         case WSP.MT.txt:
+  //           msg = [msg.source.addr, '：', msg.msg, '<br>'].join('');
+  //           break;
+  //         case WSP.MT.arch:
+  //           msg = [archName[msg.msg], '发生变化<br>'].join('');
+  //           break;
+  //         case WSP.MT.termOnline:
+  //           msg = ['终端在线状态变化：', msg.msg, '<br>'].join('');
+  //           break;
+  //         case WSP.MT.deviceAlarm:
+  //           msg = ['设备告警：', msg.msg, '<br>'].join('');
+  //           break;
+  //       }
+  //       console.log(msg);
+  //     },
+  //     connect() {
+  //       console.log("Websocket connected to " + this.$socket.nsp);
+  //     },
+
+  //     disconnect() {
+  //       console.log("Websocket disconnected from " + this.$socket.nsp);
+  //     },
+  //     error(err) {
+  //       console.error("Websocket error!", err);
+  //     }
+  //   }
+  // },
   created() {
     this.getMarkers();
+    this.getSessionId();
   }
 };
 </script>

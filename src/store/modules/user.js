@@ -59,30 +59,38 @@ const user = {
     LoginByEmail({ commit }, userInfo) {
       const email = userInfo.email.trim();
       return new Promise((resolve, reject) => {
-        loginByEmail(email, userInfo.password).then(response => {
-          const data = response.data;
-          Cookies.set('Admin-Token', response.data.token);
-          commit('SET_TOKEN', data.token);
-          resolve();
-        }).catch(error => {
-          reject(error);
-        });
+        Cookies.set('Admin-Token', 'admin');
+        commit('SET_TOKEN', 'admin');
+        resolve();
+        // loginByEmail(email, userInfo.password).then(response => {
+        //   const data = response.data;
+        //   Cookies.set('Admin-Token', response.data.token);
+        //   commit('SET_TOKEN', data.token);
+        //   resolve();
+        // }).catch(error => {
+        //   reject(error);
+        // });
       });
     },
 
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
-          const data = response.data;
-          commit('SET_ROLES', data.role);
-          commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
-          resolve(response);
-        }).catch(error => {
-          reject(error);
-        });
+        commit('SET_ROLES', ['admin']);
+        commit('SET_NAME', 'Super Admin');
+        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif');
+        commit('SET_INTRODUCTION', '我是超级管理员');
+        resolve();
+        // getInfo(state.token).then(response => {
+        //   const data = response.data;
+        //   commit('SET_ROLES', data.role);
+        //   commit('SET_NAME', data.name);
+        //   commit('SET_AVATAR', data.avatar);
+        //   commit('SET_INTRODUCTION', data.introduction);
+        //   resolve(response);
+        // }).catch(error => {
+        //   reject(error);
+        // });
       });
     },
 
@@ -103,14 +111,18 @@ const user = {
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '');
-          commit('SET_ROLES', []);
-          Cookies.remove('Admin-Token');
-          resolve();
-        }).catch(error => {
-          reject(error);
-        });
+        commit('SET_TOKEN', '');
+        commit('SET_ROLES', []);
+        Cookies.remove('Admin-Token');
+        resolve();
+        // logout(state.token).then(() => {
+        //   commit('SET_TOKEN', '');
+        //   commit('SET_ROLES', []);
+        //   Cookies.remove('Admin-Token');
+        //   resolve();
+        // }).catch(error => {
+        //   reject(error);
+        // });
       });
     },
 

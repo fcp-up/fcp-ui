@@ -20,7 +20,7 @@ import vueWaves from './directive/waves';// 水波纹指令
 import errLog from 'store/errLog';// error log组件
 // import './mock/index.js';  // 该项目所有请求使用mockjs模拟
 import VueAMap from 'vue-amap';  // 加载高德地图
-import VueWebsocket from 'vue-websocket'; // 加载webSocket组件
+// import VueWebsocket from 'vue-websocket'; // 加载webSocket组件
 
 // register globally
 Vue.component('multiselect', Multiselect);
@@ -64,7 +64,8 @@ router.beforeEach((to, from, next) => {
     } else {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetInfo').then(res => { // 拉取user_info
-          const roles = res.data.role;
+         // const roles = res.data.role;
+          const roles = ['admin'];
           store.dispatch('GenerateRoutes', { roles }).then(() => { // 生成可访问的路由表
             router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
             next({ ...to }); // hack方法 确保addRoutes已完成
@@ -87,16 +88,6 @@ router.beforeEach((to, from, next) => {
       next('/login'); // 否则全部重定向到登录页
       NProgress.done(); // 在hash模式下 改变手动改变hash 重定向回来 不会触发afterEach 暂时hack方案 ps：history模式下无问题，可删除该行！
     }
-  }
-  if (to.path === '/monitor') {
-    // 获取sessionId
-    store.dispatch('GetSessionId').then(() => {
-      if (store.getters.sessionId) {
-        const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
-        console.log(url);
-        Vue.use(VueWebsocket, url);
-      }
-    })
   }
 });
 
