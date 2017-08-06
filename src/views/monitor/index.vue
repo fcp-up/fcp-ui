@@ -10,6 +10,7 @@
 import normalMarker from '../../assets/marker/normal.png';
 import alarmMarker from '../../assets/marker/alarm.png';
 import { fetchDeviceList } from 'api/monitor';
+
 export default {
   data() {
     return {
