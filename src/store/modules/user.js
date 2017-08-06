@@ -1,4 +1,5 @@
 import { loginByEmail, logout, getInfo } from 'api/login';
+import { getSessionId } from 'api/session';
 import Cookies from 'js-cookie';
 
 const user = {
@@ -13,7 +14,8 @@ const user = {
     roles: [],
     setting: {
       articlePlatform: []
-    }
+    },
+    sessionId: ''
   },
 
   mutations: {
@@ -46,6 +48,9 @@ const user = {
     },
     LOGOUT_USER: state => {
       state.user = '';
+    },
+    SET_SESSIONID: (state, sessionId) => {
+      state.sessionId = sessionId
     }
   },
 
@@ -126,6 +131,21 @@ const user = {
         Cookies.set('Admin-Token', role);
         resolve();
       })
+    },
+
+    // 获取sessionId
+    GetSessionId({ commit }) {
+      // commit('SET_SESSIONID', 'data');
+      return new Promise((resolve, reject) => {
+        getSessionId().then(response => {
+          const data = response.data;
+          console.log(eval(data));
+          commit('SET_SESSIONID', eval(data));
+          resolve(response);
+        }).catch(error => {
+          reject(error);
+        });
+      });
     }
   }
 };

@@ -79,28 +79,28 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/terminalstate',
+    path: '/state',
     component: Layout,
     redirect: 'noredirect',
     icon: 'state',
     noDropdown: true,
     children: [{ path: 'terminalstate', component: TerminalState, name: '终端状态' }]
   }, {
-    path: '/devicedata',
+    path: '/report',
     component: Layout,
     redirect: 'noredirect',
     icon: 'device-data',
     noDropdown: true,
     children: [{ path: 'devicedata', component: DeviceData, name: '设备数据' }]
   }, {
-    path: '/devicealarmdata',
+    path: '/alarm',
     component: Layout,
     redirect: 'noredirect',
     icon: 'log',
     noDropdown: true,
     children: [{ path: 'devicealarmdata', component: DeviceAlarmData, name: '报警日志' }]
   }, {
-    path: '/devicemanage',
+    path: '/device',
     component: Layout,
     redirect: '/devicemanage/index',
     icon: 'device',
@@ -109,7 +109,7 @@ export const asyncRouterMap = [
       { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true },
       { path: 'adddevice', component: AddDevice, name: '新增设备', hidden: true }]
   }, {
-    path: '/terminalmanage',
+    path: '/terminal',
     component: Layout,
     redirect: '/terminalmanage/index',
     icon: 'terminal',

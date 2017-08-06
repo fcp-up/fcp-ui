@@ -20,6 +20,7 @@ import vueWaves from './directive/waves';// 水波纹指令
 import errLog from 'store/errLog';// error log组件
 import './mock/index.js';  // 该项目所有请求使用mockjs模拟
 import VueAMap from 'vue-amap';  // 加载高德地图
+import VueWebsocket from 'vue-websocket'; // 加载webSocket组件
 
 // register globally
 Vue.component('multiselect', Multiselect);
@@ -85,6 +86,14 @@ router.beforeEach((to, from, next) => {
     } else {
       next('/login'); // 否则全部重定向到登录页
       NProgress.done(); // 在hash模式下 改变手动改变hash 重定向回来 不会触发afterEach 暂时hack方案 ps：history模式下无问题，可删除该行！
+    }
+  }
+  if (to.path === '/monitor') {
+    if (store.getters.sessionId) {
+      console.log(store.getters.sessionId);
+      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
+      console.log(url);
+      Vue.use(VueWebsocket, url);
     }
   }
 });
