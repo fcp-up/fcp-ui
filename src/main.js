@@ -18,7 +18,7 @@ import Sticky from 'components/Sticky'; // 粘性header组件
 import IconSvg from 'components/Icon-svg';// svg 组件
 import vueWaves from './directive/waves';// 水波纹指令
 import errLog from 'store/errLog';// error log组件
-import './mock/index.js';  // 该项目所有请求使用mockjs模拟
+// import './mock/index.js';  // 该项目所有请求使用mockjs模拟
 import VueAMap from 'vue-amap';  // 加载高德地图
 import VueWebsocket from 'vue-websocket'; // 加载webSocket组件
 
@@ -89,12 +89,14 @@ router.beforeEach((to, from, next) => {
     }
   }
   if (to.path === '/monitor') {
-    if (store.getters.sessionId) {
-      console.log(store.getters.sessionId);
-      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
-      console.log(url);
-      Vue.use(VueWebsocket, url);
-    }
+    // 获取sessionId
+    store.dispatch('GetSessionId').then(() => {
+      if (store.getters.sessionId) {
+        const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
+        console.log(url);
+        Vue.use(VueWebsocket, url);
+      }
+    })
   }
 });
 

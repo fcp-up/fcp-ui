@@ -76,11 +76,9 @@ export default {
         if (valid) {
           this.loading = true;
           this.$store.dispatch('LoginByEmail', this.loginForm).then(() => {
-            this.$store.dispatch('GetSessionId').then(() => {
-              this.loading = false;
-              this.$router.push({ path: '/' });
-              // this.showDialog = true;
-            })
+            this.loading = false;
+            this.$router.push({ path: '/' });
+            // this.showDialog = true;
           }).catch(err => {
             this.$message.error(err);
             this.loading = false;

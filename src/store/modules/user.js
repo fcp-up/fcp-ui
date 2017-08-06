@@ -139,7 +139,6 @@ const user = {
       return new Promise((resolve, reject) => {
         getSessionId().then(response => {
           const data = response.data;
-          console.log(eval(data));
           commit('SET_SESSIONID', eval(data));
           resolve(response);
         }).catch(error => {
