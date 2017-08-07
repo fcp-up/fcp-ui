@@ -36,7 +36,9 @@ const WSP = {
 const archId = {
   terminal: 1,
   device: 2
-}, archName = {
+};
+
+const archName = {
   1: '终端',
   2: '设备'
 }
@@ -67,7 +69,9 @@ export default {
             if (item.longitude && item.latitude) {
               // console.log("longitude:" + item.longitude + ' latitude:' + item.latitude);
               item.icon = (item.icon == 1) ? alarmMarker : normalMarker;
+              // item.icon = alarmMarker;
               let marker = {
+                devNo: item.no,
                 position: [item.longitude, item.latitude],
                 icon: item.icon
               }
@@ -78,28 +82,56 @@ export default {
         this.loading = false;
       })
     },
-    createWs() {
+    createWs(markers, alarmMarker) {
       const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
-      const ws = new WebSocket(url);
+      let ws = new WebSocket(url);
+      function reconnect(markers, alarmMarker) {
+        let rews = new WebSocket(url);
+        rews.onmessage = function (res) {
+          // res为接收到的数据
+          let msg = eval('(' + res.data + ')');
+          if (msg.type === WSP.MT.deviceAlarm) {
+            // msg = ['设备告警：', msg.msg, '<br>'].join('');
+            let alarmMsg = eval('(' + msg.msg + ')');
+            alarmMsg.forEach(item => {
+              if (item.device) {
+                // 获取经纬度信息
+                let dev = item.device;
+                markers.forEach(item => {
+                  if (item.devNo === dev.no) {
+                    item.icon = alarmMarker
+                  }
+                })
+              }
+            });
+          }
+        };
+        rews.onclose = function () {
+          //dosomthing
+        };
+      };
+
       ws.onopen = function () {
         // console.log('连接成功');
       };
       ws.onmessage = function (res) {
         // res为接收到的数据
-        var msg = eval('(' + res.data + ')');
-        switch (msg.type) {
-          case WSP.MT.txt:
-            msg = [msg.source.addr, '：', msg.msg, '<br>'].join('');
-            break;
-          case WSP.MT.arch:
-            msg = [archName[msg.msg], '发生变化<br>'].join('');
-            break;
-          case WSP.MT.termOnline:
-            msg = ['终端在线状态变化：', msg.msg, '<br>'].join('');
-            break;
-          case WSP.MT.deviceAlarm:
-            msg = ['设备告警：', msg.msg, '<br>'].join('');
-            break;
+        let msg = eval('(' + res.data + ')');
+        console.log(msg);
+        if (msg.type === WSP.MT.deviceAlarm) {
+          // msg = ['设备告警：', msg.msg, '<br>'].join('');
+          let alarmMsg = eval('(' + msg.msg + ')');
+          alarmMsg.forEach(item => {
+            if (item.device) {
+              // 获取经纬度信息
+              let dev = item.device;
+              markers.forEach(item => {
+                if (item.devNo === dev.no) {
+                  item.icon = alarmMarker
+                }
+              })
+            }
+          });
         }
       };
       ws.onerror = function (e) { // e为错误信息
@@ -107,49 +139,20 @@ export default {
       };
       ws.onclose = function (e) { // e为关闭的原因
         console.log("Connection closed", e);
+        const that = this;
+        setTimeout(function () {
+          reconnect();
+        }, 5000);
       };
     },
     getSessionId() {
       if (!this.sessionId) {
         this.$store.dispatch('GetSessionId').then(() => {
-          this.createWs();
+          this.createWs(this.markers, alarmMarker);
         })
       }
     }
   },
-  // socket: {
-  //   events: {
-  //     changed(msg) {
-  //       console.log("Something changed: " + msg);
-  //       var msg = eval('(' + msg + ')');
-  //       switch (msg.type) {
-  //         case WSP.MT.txt:
-  //           msg = [msg.source.addr, '：', msg.msg, '<br>'].join('');
-  //           break;
-  //         case WSP.MT.arch:
-  //           msg = [archName[msg.msg], '发生变化<br>'].join('');
-  //           break;
-  //         case WSP.MT.termOnline:
-  //           msg = ['终端在线状态变化：', msg.msg, '<br>'].join('');
-  //           break;
-  //         case WSP.MT.deviceAlarm:
-  //           msg = ['设备告警：', msg.msg, '<br>'].join('');
-  //           break;
-  //       }
-  //       console.log(msg);
-  //     },
-  //     connect() {
-  //       console.log("Websocket connected to " + this.$socket.nsp);
-  //     },
-
-  //     disconnect() {
-  //       console.log("Websocket disconnected from " + this.$socket.nsp);
-  //     },
-  //     error(err) {
-  //       console.error("Websocket error!", err);
-  //     }
-  //   }
-  // },
   created() {
     this.getMarkers();
     this.getSessionId();
