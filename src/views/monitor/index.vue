@@ -109,7 +109,7 @@ export default {
         let rews = new WebSocket(url);
         rews.onmessage = function (response) {
           // res为接收到的数据
-          console.log(response.data);
+          // console.log(response.data);
           let msg = eval('(' + response.data + ')');
           if (msg.type === WSP.MT.deviceAlarm) {
             let alarmMsg = eval('(' + msg.msg + ')');
