@@ -1,7 +1,9 @@
 <template>
   <div class="monitor-container">
-    <el-amap :vid="amapcontainer" :zoom="zoom" :center="center">
-      <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
+    <el-amap vid="amapcontainer" :zoom="zoom" :center="center">
+      <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position" :events="marker.events">
+      </el-amap-marker>
+      <el-amap-info-window v-for="window in tipWindows" :key="window" :position="window.position" :visible="window.visible" :content="window.content"></el-amap-info-window>
     </el-amap>
   </div>
 </template>
@@ -9,12 +11,8 @@
 <script>
 import normalMarker from '../../assets/marker/normal.png';
 import alarmMarker from '../../assets/marker/alarm.png';
-// import store from './store';
 import { fetchDeviceList } from 'api/monitor';
 import { mapGetters } from 'vuex';
-
-//const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', store.getters.sessionId].join('');
-// const ws = new WebSocket(url);
 
 const WSP = {
   ST: {
@@ -49,6 +47,7 @@ export default {
       zoom: 14,
       center: [102.82756, 24.943165],
       markers: [],
+      tipWindows: [],
       loading: false
     }
   },
@@ -65,6 +64,7 @@ export default {
         let res = response.data;
         if (res.data.length) {
           let deviceList = res.data;
+          let self = this;
           deviceList.forEach(function (item) {
             if (item.longitude && item.latitude) {
               // console.log("longitude:" + item.longitude + ' latitude:' + item.latitude);
@@ -73,41 +73,67 @@ export default {
               let marker = {
                 devNo: item.no,
                 position: [item.longitude, item.latitude],
-                icon: item.icon
+                icon: item.icon,
+                visible: false,
+                content: `<div class="prompt">设备${item.no}</div>`,
+                events: {
+                  click() {
+                    for (let i = 0; i < self.tipWindows.length; i++) {
+                      self.tipWindows[i].visible = false;                      
+                    }                    
+                    self.$nextTick(() => {
+                      for (let i = 0; i < self.tipWindows.length; i++) {
+                        if ( self.tipWindows[i].devNo === marker.devNo) {
+                           self.tipWindows[i].visible = true;           
+                        }            
+                      }  
+                    });                                        
+                  }
+                }
               }
-              this.markers.push(marker)
+              this.markers.push(marker);
+              this.tipWindows.push(marker);
             }
           }, this)
         }
         this.loading = false;
       })
     },
-    createWs(markers, alarmMarker) {
-      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
+    createWs(markers) {
+      // const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
+      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', this.sessionId].join('');
       let ws = new WebSocket(url);
-      function reconnect(markers, alarmMarker) {
+      let tConnected = null;
+      function reconnect() {
+        // console.log('链接断开，重新链接.');
         let rews = new WebSocket(url);
-        rews.onmessage = function (res) {
+        rews.onmessage = function (response) {
           // res为接收到的数据
-          let msg = eval('(' + res.data + ')');
+          console.log(response.data);
+          let msg = eval('(' + response.data + ')');
           if (msg.type === WSP.MT.deviceAlarm) {
-            // msg = ['设备告警：', msg.msg, '<br>'].join('');
             let alarmMsg = eval('(' + msg.msg + ')');
-            alarmMsg.forEach(item => {
-              if (item.device) {
-                // 获取经纬度信息
-                let dev = item.device;
-                markers.forEach(item => {
-                  if (item.devNo === dev.no) {
-                    item.icon = alarmMarker
-                  }
-                })
+            for (var i = 0; i < markers.length; i++) {
+              let marker = markers[i];
+              for (var j = 0; j < alarmMsg.length; j++) {
+                let amsg = alarmMsg[j];
+                if (amsg.device && amsg.device.no === marker.devNo) {
+                  //设置告警状态
+                  markers[i].icon = alarmMarker;
+                }
               }
-            });
+            }
           }
         };
         rews.onclose = function () {
-          //dosomthing
+          tConnected = window.setTimeout(reconnect, 3000);
+        };
+        ws.onopen = function () {
+          // console.log('连接成功');
+          if (tConnected) {
+            // console.log('链接成功，清除定时器.');
+            window.clearInterval(tConnected);
+          }
         };
       };
 
@@ -117,38 +143,32 @@ export default {
       ws.onmessage = function (res) {
         // res为接收到的数据
         let msg = eval('(' + res.data + ')');
-        console.log(msg);
         if (msg.type === WSP.MT.deviceAlarm) {
           // msg = ['设备告警：', msg.msg, '<br>'].join('');
           let alarmMsg = eval('(' + msg.msg + ')');
-          alarmMsg.forEach(item => {
-            if (item.device) {
-              // 获取经纬度信息
-              let dev = item.device;
-              markers.forEach(item => {
-                if (item.devNo === dev.no) {
-                  item.icon = alarmMarker
-                }
-              })
+          for (var i = 0; i < markers.length; i++) {
+            let marker = markers[i];
+            for (var j = 0; j < alarmMsg.length; j++) {
+              let amsg = alarmMsg[j];
+              if (amsg.device && amsg.device.no === marker.devNo) {
+                //设置告警状态
+                markers[i].icon = alarmMarker;
+              }
             }
-          });
+          }
         }
       };
       ws.onerror = function (e) { // e为错误信息
-        console.log("WebSocket Error: ", e);
+        // console.log("WebSocket Error: ", e);
       };
       ws.onclose = function (e) { // e为关闭的原因
-        console.log("Connection closed", e);
-        const that = this;
-        setTimeout(function () {
-          reconnect();
-        }, 5000);
+        tConnected = window.setTimeout(reconnect, 3000);
       };
     },
     getSessionId() {
       if (!this.sessionId) {
         this.$store.dispatch('GetSessionId').then(() => {
-          this.createWs(this.markers, alarmMarker);
+          this.createWs(this.markers);
         })
       }
     }
