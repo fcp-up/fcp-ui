@@ -32,7 +32,7 @@
       </el-col>
       <el-col :xs="8" :sm="6" :md="4" :lg="10">
         <div class="mapzone">
-          <el-amap :vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
+          <el-amap vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
             <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
           </el-amap>
         </div>  
@@ -117,7 +117,6 @@ export default {
   },
   created() {
     let curTerminal = this.$route.query.terminal;
-    console.log(curTerminal);
     this.terminal.no = curTerminal.no || '';
     this.terminal.name = curTerminal.name || '';
     this.terminal.latitude = curTerminal.latitude || '';

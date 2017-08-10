@@ -44,4 +44,11 @@ export function validatAlphabets(str) {
   return reg.test(str);
 }
 
+/* 终端号*/
+export function visWsTerminalNo(str) {
+  const reg = /^[0-8]{10}/;
+  return reg.test(str);
+}
+
+
 

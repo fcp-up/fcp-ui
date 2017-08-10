@@ -100,8 +100,8 @@ export default {
       })
     },
     createWs(markers) {
-      // const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
-      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', this.sessionId].join('');
+      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
+      // const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', this.sessionId].join('');
       let ws = new WebSocket(url);
       let tConnected = null;
       function reconnect() {

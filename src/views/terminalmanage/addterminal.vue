@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row>
       <el-col :xs="8" :sm="6" :md="4" :lg="8">
-        <el-form ref="form" :model="terminal" label-width="100px">
+        <el-form :model="terminal" :rules="terminalRules" ref="terminalForm"  label-width="100px">
           <el-form-item label="终端编号">
             <el-input v-model="terminal.no"></el-input>
           </el-form-item>
@@ -22,15 +22,15 @@
             <div class='tips'>{{tips}}</div>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="large" @click="saveTerminalInfo">保存</el-button>
+            <el-button type="primary" size="large" @click="submitForm('terminalForm')">保存</el-button>
             <el-button size="large" @click="cancel">取消</el-button>
           </el-form-item>
         </el-form>
       </el-col>
       <el-col :xs="8" :sm="6" :md="4" :lg="10">
         <div class="mapzone">
-          <el-amap :vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
-            <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
+          <el-amap vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
+            <el-amap-marker :position="marker"> </el-amap-marker>
           </el-amap>
         </div>
       </el-col>
@@ -50,7 +50,7 @@
 
 .mapzone {
   width: 80%;
-  height: 220px;
+  height: 270px;
   margin: 15px 15px 15px 15px;
 }
 
@@ -69,23 +69,37 @@
 
 <script>
 import { addTerminal } from 'api/terminal';
+import { visWsTerminalNo } from 'utils/validate';
 export default {
   data() {
     let self = this;
+    const validateTerminalNo = (rule, value, callback) => {
+      console.log(visWsTerminalNo(value));
+      if (!visWsTerminalNo(value)) {
+        callback(new Error('请输入正确的合法手机号'));
+      } else {
+        callback();
+      }
+    };
     return {
       tips: '',
       terminal: {
         no: '',
         name: '',
-        longitude: '',
-        latitude: '',
+        longitude: '102.82756',
+        latitude: '24.943165',
         adminDivNo: '',
         alarmPhoneNo: '',
         address: ''
       },
+      terminalRules: {
+        alarmPhoneNo: [
+          { required: true, trigger: 'blur', validator: validateTerminalNo }
+        ]
+      },
       zoom: 14,
       center: [102.82756, 24.943165],
-      markers: [],
+      marker: [102.82756, 24.943165],
       loading: false,
       events: {
         click(e) {
@@ -112,25 +126,34 @@ export default {
       },
     };
   },
-  created() {},
+  created() { },
   methods: {
-    saveTerminalInfo() {
-      addTerminal(this.terminal).then(response => {
-        let res = response.data;
-        if (res.code == 0) {
-          this.tips = '终端信息新增存储成功.'
-          this.$router.go(-1);
+    submitForm(terminalForm) {
+      this.$refs[terminalForm].validate(valid => {
+        console.log(valid);
+        return;
+        if (valid) {
+          addTerminal(this.terminal).then(response => {
+            let res = response.data;
+            if (res.code == 0) {
+              this.tips = '终端信息新增存储成功.'
+              this.$router.go(-1);
+            } else {
+              this.tips = '终端信息新增存储失败.'
+            }
+            this.listLoading = false;
+          })
         } else {
-          this.tips = '终端信息新增存储失败.'
+          console.log('error submit!!');
+          return false;
         }
-        this.listLoading = false;
-      })
+      });
     },
     cancel() {
       this.$router.go(-1)
     },
     changePosition(position) {
-      this.markers[0].position = position;
+      this.marker = position;
     }
 
   }
