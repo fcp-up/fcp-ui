@@ -4,7 +4,7 @@
       <el-col :xs="8" :sm="6" :md="4" :lg="8">
         <el-form ref="form" :model="device" label-width="100px">
           <el-form-item label="设备编号">
-            <el-input v-model="device.no"></el-input>
+            <el-input v-model="device.no" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="安装地址">
             <el-input v-model="device.address"></el-input>
@@ -35,7 +35,7 @@
       </el-col>
       <el-col :xs="8" :sm="6" :md="4" :lg="10">
         <div class="mapzone">
-          <el-amap :vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
+          <el-amap vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
             <el-amap-marker v-for="marker in markers" :key="marker" :icon="marker.icon" :position="marker.position"> </el-amap-marker>
           </el-amap>
         </div>
