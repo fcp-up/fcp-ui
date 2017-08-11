@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-col :xs="8" :sm="6" :md="4" :lg="8">
+      <el-col :xs="24" :sm="12" :md="12" :lg="8">
         <el-form :model="terminal" :rules="terminalRules" ref="terminalForm"  label-width="100px">
-          <el-form-item label="终端编号">
+          <el-form-item label="终端编号" prop="no">
             <el-input v-model="terminal.no"></el-input>
           </el-form-item>
           <el-form-item label="终端名称">
@@ -15,7 +15,7 @@
           <el-form-item label="位置纬度">
             <el-input v-model="terminal.latitude"></el-input>
           </el-form-item>
-          <el-form-item label="安装地址">
+          <el-form-item label="安装地址" prop="address">
             <el-input v-model="terminal.address"></el-input>
           </el-form-item>
           <el-form-item>
@@ -27,7 +27,7 @@
           </el-form-item>
         </el-form>
       </el-col>
-      <el-col :xs="8" :sm="6" :md="4" :lg="10">
+      <el-col :xs="24" :sm="12" :md="12" :lg="10">
         <div class="mapzone">
           <el-amap vid="amapcontainer" :zoom="zoom" :center="center" :events="events">
             <el-amap-marker :position="marker"> </el-amap-marker>
@@ -74,9 +74,8 @@ export default {
   data() {
     let self = this;
     const validateTerminalNo = (rule, value, callback) => {
-      console.log(visWsTerminalNo(value));
       if (!visWsTerminalNo(value)) {
-        callback(new Error('请输入正确的合法手机号'));
+        callback(new Error('编号有误,须由10位数字组成，如0000100001'));
       } else {
         callback();
       }
@@ -93,8 +92,11 @@ export default {
         address: ''
       },
       terminalRules: {
-        alarmPhoneNo: [
+        no: [
           { required: true, trigger: 'blur', validator: validateTerminalNo }
+        ],
+        address: [
+          { required: true, trigger: 'blur', message: '点击右侧地图可获取地址'}
         ]
       },
       zoom: 14,
@@ -130,8 +132,6 @@ export default {
   methods: {
     submitForm(terminalForm) {
       this.$refs[terminalForm].validate(valid => {
-        console.log(valid);
-        return;
         if (valid) {
           addTerminal(this.terminal).then(response => {
             let res = response.data;
@@ -144,7 +144,6 @@ export default {
             this.listLoading = false;
           })
         } else {
-          console.log('error submit!!');
           return false;
         }
       });

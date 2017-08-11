@@ -46,7 +46,7 @@ export function validatAlphabets(str) {
 
 /* 终端号*/
 export function visWsTerminalNo(str) {
-  const reg = /^[0-8]{10}/;
+  const reg = /^\d{10}$/;
   return reg.test(str);
 }
 
