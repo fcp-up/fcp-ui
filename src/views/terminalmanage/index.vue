@@ -3,7 +3,7 @@
     <el-row>
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
-          <el-input v-model="formInline.keywords" placeholder="输入终端编号或名称关键词检索"></el-input>
+          <el-input v-model="formInline.queryStr" placeholder="输入终端编号或名称关键词检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       formInline: {
-        keywords: ''
+        queryStr: ''
       },
       list: null,
       listLoading: true, 
@@ -90,19 +90,16 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      let keywords = this.formInline.keywords || '';
-      let currentPage = this.currentPage || 1;
-      let pageSize = this.pageSize || 10;    
       const requestParams = {
-        keywords,
-        currentPage,
-        pageSize
+        'queryStr': this.formInline.queryStr || '',
+        'currentPage': this.page.currentPage || 1,
+        'pageSize': this.page.pageSize || 10
       }  
-      getTerminalList(this.requestParams).then(response => {
+      getTerminalList(requestParams).then(response => {
         let res = response.data;
         if (res.code == 0) {
           this.list = res.data;
-          this.page.total = res.data.length;          
+          this.page.total = res.total;         
         } else {
           console.log('获取终端列表失败.');
         }

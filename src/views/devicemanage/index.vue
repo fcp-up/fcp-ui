@@ -5,7 +5,7 @@
         <el-form-item>
           <el-input v-model="formInline.queryStr" placeholder="输入设备编号或名称关键词检索"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item style="margin-bottom:20px;">
           <el-button type="primary" icon="search" @click="fetchData">查询</el-button>
           <el-button type="primary" icon="document" @click="handleDownload">导出excel</el-button>
           <!-- <el-button style='margin-bottom:20px;float:right' type="primary" icon="plus" @click="onAdd">新增</el-button> -->
@@ -86,12 +86,17 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getDeviceList().then(response => {
+      const requestParams = {
+        'queryStr': this.formInline.queryStr || '',
+        'currentPage': this.page.currentPage || 1,
+        'pageSize': this.page.pageSize || 10
+      } 
+      getDeviceList(requestParams).then(response => {
         let res = response.data;
         console.log(res);
         if (res.code == 0) {
           this.list = res.data;
-          this.total = res.data.length;
+          this.page.total = res.total;
         } else {
           console.log('获取终端列表失败.');
         }

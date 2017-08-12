@@ -137,7 +137,8 @@ export default {
     saveDeviceInfo() {
       // {"tag":{"no":"1"},"obj":{"longitude":"102.819979","latitude":"24.944099","alarmPhone":"1","address":"33333中","name":"终端--1"}}
       let tags = {
-        no: this.device.no
+        no: this.device.no,
+        termnalNo: this.device.terminalNo
       }
       saveDevice(tags, this.device).then(response => {
         let res = response.data;
