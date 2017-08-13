@@ -2,12 +2,18 @@
   <div class="app-container">
     <el-row>
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="报警时间">
-          <el-date-picker v-model="formInline.dateValue" type="daterange" placeholder="选择时间范围">
-          </el-date-picker>
+        <el-form-item>
+          <el-select v-model="terminalOrDevice" placeholder="按设备编号"> 
+            <el-option 
+              v-for="item in queryKind"
+              :key="item.value"
+              :label="item.label" 
+              :value="item.value"> 
+            </el-option>
+          </el-select>          
         </el-form-item>
-        <el-form-item label="设备编号">
-          <el-input v-model="formInline.terminalNo" placeholder="输入关键词检索"></el-input>
+        <el-form-item>
+          <el-input v-model="formInline.keywords" placeholder="输入相应编号检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onQuery">查询</el-button>
@@ -18,30 +24,26 @@
     <el-row>
       <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
         fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
-        <el-table-column prop="no" label="设备编号" width="120" fixed="left">
+        <el-table-column type="index" label="序号" width="80">
         </el-table-column>
-        <el-table-column prop="name" label="设备名称" width="360" show-overflow-tooltip="true">
+        <el-table-column prop="deviceNo" label="设备编号" width="120">
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="360">
+        <el-table-column prop="deviceName" label="设备名称" width="360" :show-overflow-tooltip="true">
         </el-table-column>
+        <el-table-column prop="deviceAddr" label="设备位置" width="360">
+        </el-table-column>   
+        <el-table-column prop="time" label="报警时间" width="360">
+        </el-table-column>      
         <el-table-column prop="terminalNo" label="终端编号" width="120">
         </el-table-column>
-        <el-table-column prop="time" label="报警时间" width="200" show-overflow-tooltip="true">
-        </el-table-column>
-        <el-table-column prop="state" label="电池电压" width="100">
-        </el-table-column>
-        <el-table-column prop="lastSignal" label="信号强度" width="100">
-        </el-table-column>
-        <el-table-column prop="longitude" label="位置经度" width="180">
-        </el-table-column>
-        <el-table-column prop="latitude" label="位置维度" width="180">
-        </el-table-column>
+        <el-table-column prop="terminalAddr" label="终端地址" width="360">
+        </el-table-column>      
       </el-table>
     </el-row>
     <el-row>
       <div class="pagination" v-if="page.total">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
-        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
+        :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row>
@@ -50,7 +52,7 @@
 
 <style scoped>
 .el-select {
-  width: 100px;
+  width: 130px;
 }
 
 .el-form-item {
@@ -63,19 +65,28 @@
 </style>
 
 <script>
-import { getDeviceList } from 'api/device';
+import { getDeviceDataList } from 'api/device';
 import { parseTime } from 'utils/index';
 export default {
   data() {
     return {
       formInline: {
-        dateValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-        states: [{ 'label': '全部', value: -1 }, { 'label': '在线', value: 1 }, { 'label': '离线', value: 0 }],
-        currentState: -1,
-        terminalNo: ''
+        startTime: '',
+        endTime: '',
+        keywords: ''
+      },
+      pickerOptions: {
+        onPick({maxDate, minDate}) {
+          console.log('甩甩有')
+        }
       },
       list: null,
       listLoading: true, 
+      queryKind: [
+        { label: '按设备编号', value: '1' },
+        { label: '按终端编号', value: '2' }
+      ],
+      terminalOrDevice: '1',
       page: {
         currentPage: null,
         pageSize: 10,
@@ -90,11 +101,22 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getDeviceList(this.listQuery).then(response => {
+      this.listQuery = {
+        pageSize: this.page.pageSize || 10,
+        pageIndex: this.page.currentPage || 1
+      }
+      if (this.formInline.keywords) {
+        if (this.terminalOrDevice === '2') {
+          this.listQuery.terminalNo = this.formInline.keywords
+        }else{
+          this.listQuery.deviceNo = this.formInline.keywords
+        }
+      }
+      getDeviceDataList(this.listQuery).then(response => {
         let res = response.data;
         if (res.code == 0){
           this.list = res.data;
-          this.page.total = this.list.length;
+          this.page.total = res.data.length;
           this.list.forEach(function(item,index){
             if(item.lastAlarmTime){
               this.list[index].time = item.lastAlarmTime == undefined ? '' : parseTime(item.lastAlarmTime) ; 
@@ -104,13 +126,16 @@ export default {
         this.listLoading = false;
       })
     },
+    onQuery() {
+      this.fetchData();
+    },
     handleDownload() {
       require.ensure([], () => {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['序号', '文章标题', '作者', '阅读数', '发布时间'];
-        const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time'];
+        const tHeader = ['设备编号', '设备名称', '安装地址', '终端编号', '报警时间', '电池电压', '信号强度', '位置经度', '位置维度'];
+        const filterVal = ['no', 'name', 'address', 'terminalNo', 'time', 'state', 'lastSignal', 'longitude', 'latitude'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');

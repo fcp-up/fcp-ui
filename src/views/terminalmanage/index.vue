@@ -3,7 +3,17 @@
     <el-row>
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
-          <el-input v-model="formInline.queryStr" placeholder="输入终端编号或名称关键词检索"></el-input>
+          <el-select v-model="formInline.currentKind"> 
+            <el-option 
+              v-for="item in queryKind"
+              :key="item.value"
+              :label="item.label" 
+              :value="item.value"> 
+            </el-option>
+          </el-select>          
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="formInline.queryStr" placeholder="输入相应内容检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
@@ -49,6 +59,11 @@
 </template>
 
 <style scoped>
+
+.el-select {
+  width: 130px;
+}
+
 .el-input {
   width: 300px;
 }
@@ -72,8 +87,13 @@ export default {
   data() {
     return {
       formInline: {
-        queryStr: ''
+        queryStr: '',
+        currentKind: '1'
       },
+      queryKind: [
+        { label: '按终端编号', value: '1' },
+        { label: '按终端名称', value: '2' }
+      ],
       list: null,
       listLoading: true, 
       page: {
@@ -91,9 +111,9 @@ export default {
     fetchData() {
       this.listLoading = true;
       const requestParams = {
-        'queryStr': this.formInline.queryStr || '',
-        'currentPage': this.page.currentPage || 1,
-        'pageSize': this.page.pageSize || 10
+        queryStr: this.formInline.queryStr || '',
+        currentPage: this.page.currentPage || 1,
+        pageSize: this.page.pageSize || 10
       }  
       getTerminalList(requestParams).then(response => {
         let res = response.data;

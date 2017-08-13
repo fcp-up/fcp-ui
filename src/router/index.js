@@ -91,14 +91,8 @@ export const asyncRouterMap = [
     redirect: 'noredirect',
     icon: 'device-data',
     noDropdown: true,
-    children: [{ path: 'devicedata', component: DeviceData, name: '设备数据' }]
-  }, {
-    path: '/alarm',
-    component: Layout,
-    redirect: 'noredirect',
-    icon: 'log',
-    noDropdown: true,
-    children: [{ path: 'devicealarmdata', component: DeviceAlarmData, name: '报警日志' }]
+    children: [{ path: 'devicedata', component: DeviceData, name: '设备数据' },
+      { path: 'devicealarmdata', component: DeviceAlarmData, name: '报警日志', hidden: true }]
   }, {
     path: '/device',
     component: Layout,

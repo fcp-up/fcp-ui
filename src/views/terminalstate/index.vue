@@ -1,19 +1,25 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="状态类型">
-          <el-select v-model="formInline.currentState" placeholder="请选择">
-            <el-option v-for="item in formInline.states" :key="item.value" :label="item.label" :value="item.value">
+      <el-form :inline="true" :model="formInline" class="demo-form-inline"> 
+        <el-form-item>
+          <el-select v-model="formInline.currentKind"> 
+            <el-option 
+              v-for="item in queryKind"
+              :key="item.value"
+              :label="item.label" 
+              :value="item.value"> 
+            </el-option>
+          </el-select>          
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="formInline.keywords" placeholder="输入相应内容检索"></el-input>
+        </el-form-item>       
+        <el-form-item label="终端状态">
+          <el-select v-model="formInline.currentState">
+            <el-option v-for="item in terminalStates" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="在/离线时间">
-          <el-date-picker v-model="formInline.dateValue" type="daterange" placeholder="选择时间范围">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="终端编号">
-          <el-input v-model="formInline.terminalNo" placeholder="输入关键词检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onQuery">查询</el-button>
@@ -73,7 +79,7 @@
 
 <style scoped>
 .el-select {
-  width: 100px;
+  width: 130px;
 }
 .el-form-item {
   margin-bottom: 0px;
@@ -91,10 +97,18 @@ export default {
     return {
       formInline: {
         dateValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-        states: [{ 'label': '全部', value: -1 }, { 'label': '在线', value: 1 }, { 'label': '离线', value: 0 }],
-        currentState: -1,
-        terminalNo: ''
+        currentState: 0,
+        keywords: '',
+        currentKind: '1'
       },
+      queryKind: [
+        { label: '按终端编号', value: '1' },
+        { label: '按终端名称', value: '2' }
+      ],
+      terminalStates: [
+        { label: '全部', value: 0 }, 
+        { label: '在线', value: 1 }, 
+        { label: '离线', value: 2 }],
       list: null,
       listLoading: true, 
       page: {

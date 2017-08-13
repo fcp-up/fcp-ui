@@ -17,6 +17,19 @@ export function getDeviceList(requestParams) {
   });
 }
 
+export function getDeviceDataList(requestParams) {
+  const getParams = new URLSearchParams();
+  getParams.append('params', JSON.stringify(requestParams));
+  return fetch({
+    url: '/fcp/alarm/deviceAlarm/list',
+    method: 'post',
+    params: getParams,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
+
 export function saveDevice(oldValue, newValue) {
   const updateparams = {
     tag: oldValue,
