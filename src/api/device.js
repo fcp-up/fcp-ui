@@ -21,8 +21,8 @@ export function getDeviceDataList(requestParams) {
   const getParams = new URLSearchParams();
   getParams.append('params', JSON.stringify(requestParams));
   return fetch({
-    url: '/fcp/alarm/deviceAlarm/list',
-    method: 'post',
+    url: '/fcp/device/list',
+    method: 'get',
     params: getParams,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

@@ -3,7 +3,7 @@
     <el-row>
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
-          <el-select v-model="terminalOrDevice" placeholder="按设备编号"> 
+          <el-select v-model="formInline.currentKind" placeholder="按设备编号"> 
             <el-option 
               v-for="item in queryKind"
               :key="item.value"
@@ -36,11 +36,11 @@
         fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
         <el-table-column type="index" label="序号" width="80">
         </el-table-column>
-        <el-table-column prop="deviceNo" label="设备编号" width="120">
+        <el-table-column prop="no" label="设备编号" width="120">
         </el-table-column>
-        <el-table-column prop="deviceName" label="设备名称" width="360" :show-overflow-tooltip="true">
+        <el-table-column prop="name" label="设备名称" width="360" :show-overflow-tooltip="true">
         </el-table-column>
-        <el-table-column prop="deviceAddr" label="设备位置" width="360">
+        <el-table-column prop="address" label="设备位置" width="360">
         </el-table-column>   
         <el-table-column prop="time" label="报警时间" width="360">
         </el-table-column>      
@@ -85,6 +85,7 @@ export default {
         startTime: '',
         endTime: '',
         keywords: '',
+        currentKind: 'deviceKey',
         deviceState: '0'
       },
       pickerOptions: {
@@ -95,8 +96,8 @@ export default {
       list: null,
       listLoading: true, 
       queryKind: [
-        { label: '按设备编号', value: '1' },
-        { label: '按终端编号', value: '2' }
+        { label: '按设备编号', value: 'deviceKey' },
+        { label: '按终端编号', value: 'terminalKey' }
       ],
       deviceStateList: [
         { label: '默认', value: '0' },
@@ -123,10 +124,10 @@ export default {
         pageIndex: this.page.currentPage || 1
       }
       if (this.formInline.keywords) {
-        if (this.terminalOrDevice === '2') {
-          this.listQuery.terminalNo = this.formInline.keywords
+        if (this.formInline.currentKind === 'terminalKey') {
+          this.listQuery.terminalKey = this.formInline.keywords
         }else{
-          this.listQuery.deviceNo = this.formInline.keywords
+          this.listQuery.deviceKey = this.formInline.keywords
         }
       }
       getDeviceDataList(this.listQuery).then(response => {

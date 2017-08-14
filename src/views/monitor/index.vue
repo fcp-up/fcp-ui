@@ -48,7 +48,13 @@ export default {
       center: [102.82756, 24.943165],
       markers: [],
       tipWindows: [],
-      loading: false
+      loading: false,
+      listQuery: null,
+      page: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0 
+      }
     }
   },
   computed: {
@@ -60,9 +66,13 @@ export default {
     getMarkers() {
       this.loading = true;
       this.markers = [];
-      fetchDeviceList().then(response => {
+      this.listQuery = {
+        pageSize: this.page.pageSize || 10000,
+        pageIndex: this.page.currentPage || 1
+      }
+      fetchDeviceList(this.listQuery).then(response => {
         let res = response.data;
-        if (res.data.length) {
+        if (res.code === 0) {
           let deviceList = res.data;
           let self = this;
           deviceList.forEach(function (item) {
@@ -100,8 +110,8 @@ export default {
       })
     },
     createWs(markers) {
-      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
-      // const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', this.sessionId].join('');
+      // const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/api/fcp/ws/socket/', this.sessionId].join('');
+      const url = ['ws://', location.href.replace(/http?:\/\/([^\/]+).*/, '$1'), '/fcp/ws/socket/', this.sessionId].join('');
       let ws = new WebSocket(url);
       let tConnected = null;
       function reconnect() {

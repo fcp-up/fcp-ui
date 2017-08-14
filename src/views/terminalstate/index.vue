@@ -29,23 +29,23 @@
     </el-row>
     <el-row>
       <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
-        fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500" >
+        highlight-current-row style="width: 100%" max-height="500" >
         <el-table-column prop="no" label="终端编号" width="140" fixed="left">
           <template scope="scope">
             <span>{{ scope.row.no }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="终端名称" width="250" show-overflow-tooltip="true">
+        <el-table-column prop="name" label="终端名称" width="250" >
            <template scope="scope">
             <span>{{ scope.row.name }}</span>
            </template>
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="300" show-overflow-tooltip="true">
+        <el-table-column prop="address" label="安装地址" width="300">
             <template scope="scope">
              <span>{{ scope.row.address }}</span>
            </template>
         </el-table-column>        
-        <el-table-column prop="alarmPhone" label="报警电话" width="300" show-overflow-tooltip="true">
+        <el-table-column prop="alarmPhone" label="报警电话" width="300">
             <template scope="scope">
             <span>{{ scope.row.alarmPhone }}</span>
            </template>
@@ -55,7 +55,7 @@
             <span>{{ scope.row.state }}</span>
           </template>
         </el-table-column>
-         <el-table-column prop="lastOnlineTime" label="状态时间" width="180" show-overflow-tooltip="true">
+         <el-table-column prop="lastOnlineTime" label="状态时间" width="180">
            <template scope="scope">
              <span>{{ scope.row.stateTime }}</span>
            </template>
@@ -68,11 +68,11 @@
       </el-table>
     </el-row>
     <el-row>
-      <div class="pagination" v-if="page.total">
+       <div class="pagination" v-if="page.total">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
-        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
+         :page-size="page.pageSize" layout="total,prev, pager, next" :total="page.total">
         </el-pagination>
-      </div>
+      </div> 
     </el-row>
   </div>
 </template>
@@ -99,23 +99,23 @@ export default {
         dateValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
         currentState: 0,
         keywords: '',
-        currentKind: '1'
+        currentKind: 'terminalNo'
       },
       queryKind: [
-        { label: '按终端编号', value: '1' },
-        { label: '按终端名称', value: '2' }
+        { label: '按终端编号', value: 'terminalNo' },
+        { label: '按终端名称', value: 'terminalName' }
       ],
       terminalStates: [
         { label: '全部', value: 0 }, 
         { label: '在线', value: 1 }, 
         { label: '离线', value: 2 }],
-      list: null,
+      list: [],
+      listQuery: null,
       listLoading: true, 
       page: {
-        currentPage: null,
+        currentPage: 1,
         pageSize: 10,
-        total: null,
-        pageSizes: null
+        total: 0 
       }     
     };
   },
@@ -124,11 +124,16 @@ export default {
   },
   methods: {
     fetchData() {
-      this.listLoading = true;      
+      this.listLoading = false;      
+      this.listQuery = {
+        pageSize: this.page.pageSize || 10,
+        pageIndex: this.page.currentPage || 1
+      }
       getTerminalList(this.listQuery).then(response => {
-        if(!response.code){
-          this.list = response.data.data;
-          this.page.total = this.list.length;
+        let res = response.data;
+        if(res.code === 0){         
+          this.list = res.data;
+          this.page.total = res.total;
           this.list.forEach(function(item,index){
              this.list[index].state = item.lastOnlineState == 1 ? '在线' : (item.lastOnlineState == 0?'离线':item.lastOnlineState);
              this.list[index].stateTime = item.lastOnlineTime == undefined ? '' : parseTime(item.lastOnlineTime) ; 
@@ -138,6 +143,9 @@ export default {
         }
         this.listLoading = false;
       })
+    },
+    onQuery() {
+      this.fetchData()
     },
     handleDownload() {
       require.ensure([], () => {
