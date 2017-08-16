@@ -13,7 +13,7 @@
           </el-select>          
         </el-form-item>
         <el-form-item>
-          <el-input v-model="formInline.keywords" placeholder="输入相应编号检索"></el-input>
+          <el-input v-model="formInline.keywords" placeholder="输入相应内容检索"></el-input>
         </el-form-item>
         <el-form-item label="当前状态">
           <el-select v-model="formInline.deviceState" placeholder="默认"> 
@@ -26,7 +26,7 @@
           </el-select>          
         </el-form-item>        
         <el-form-item>
-          <el-button type="primary" @click="onQuery">查询</el-button>
+          <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
           <el-button style='margin-bottom:20px;float:right' type="primary" icon="document" @click="handleDownload">导出excel</el-button>
         </el-form-item>
       </el-form>
@@ -36,24 +36,31 @@
         fit highlight-current-row  tooltip-effect="dark" style="width: 100%" max-height="500">
         <el-table-column type="index" label="序号" width="80">
         </el-table-column>
-        <el-table-column prop="no" label="设备编号" width="120">
+        <el-table-column prop="no" label="设备编号" width="140">
         </el-table-column>
-        <el-table-column prop="name" label="设备名称" width="360" :show-overflow-tooltip="true">
-        </el-table-column>
-        <el-table-column prop="address" label="设备位置" width="360">
+        <el-table-column prop="name" label="设备名称" width="230" :show-overflow-tooltip="true">
+        </el-table-column> 
+        <el-table-column prop="lastAlarm" label="当前状态" width="100">
+          <template scope="scope">
+            <span v-bind:class="{'isAlarm': scope.row.isAlarm }">{{ scope.row.lastAlarm }}</span>
+          </template>
+        </el-table-column>        
+        <el-table-column prop="alarmTime" label="数据时间" width="180">
         </el-table-column>   
-        <el-table-column prop="time" label="报警时间" width="360">
-        </el-table-column>      
-        <el-table-column prop="terminalNo" label="终端编号" width="120">
-        </el-table-column>
-        <el-table-column prop="terminalAddr" label="终端地址" width="360">
-        </el-table-column>      
+        <el-table-column prop="address" label="设备位置" width="250" :show-overflow-tooltip="true">
+        </el-table-column>             
+        <el-table-column prop="lastPressure" label="电池电压" width="120">
+        </el-table-column> 
+        <el-table-column prop="lastSignal" label="信号强度" width="120">
+        </el-table-column> 
+        <el-table-column prop="terminalNo" label="终端编号" width="140">
+        </el-table-column>    
       </el-table>
     </el-row>
     <el-row>
       <div class="pagination" v-if="page.total">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
-        :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
+        :page-size="page.pageSize" layout="total, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row>
@@ -73,6 +80,9 @@
 .pagination {
   text-align: center;
 }
+.isAlarm {
+  color: red;
+}
 </style>
 
 <script>
@@ -85,7 +95,7 @@ export default {
         startTime: '',
         endTime: '',
         keywords: '',
-        currentKind: 'deviceKey',
+        currentKind: 'deviceNo',
         deviceState: '0'
       },
       pickerOptions: {
@@ -96,8 +106,10 @@ export default {
       list: null,
       listLoading: true, 
       queryKind: [
-        { label: '按设备编号', value: 'deviceKey' },
-        { label: '按终端编号', value: 'terminalKey' }
+        { label: '按设备编号', value: 'deviceNo' },
+        { label: '按设备名称', value: 'deviceName' },
+        { label: '按终端编号', value: 'terminalNo' },
+        { label: '按终端名称', value: 'terminalName' }
       ],
       deviceStateList: [
         { label: '默认', value: '0' },
@@ -137,7 +149,9 @@ export default {
           this.page.total = res.data.length;
           this.list.forEach(function(item,index){
             if(item.lastAlarmTime){
-              this.list[index].time = item.lastAlarmTime == undefined ? '' : parseTime(item.lastAlarmTime) ; 
+              this.list[index].lastAlarm = item.lastIsAlarm == 1 ? '报警' : '正常';
+              this.list[index].alarmTime = item.lastAlarmTime == undefined ? '' : parseTime(item.lastAlarmTime) ; 
+              this.list[index].isAlarm = item.lastIsAlarm == 1 ? true : false ; 
             }
           },this);
         }
@@ -152,8 +166,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['设备编号', '设备名称', '安装地址', '终端编号', '报警时间', '电池电压', '信号强度', '位置经度', '位置维度'];
-        const filterVal = ['no', 'name', 'address', 'terminalNo', 'time', 'state', 'lastSignal', 'longitude', 'latitude'];
+        const tHeader = ['设备编号', '设备名称', '安装地址', '终端编号', '设备状态', '数据时间', ,'电池电压', '信号强度'];
+        const filterVal = ['no', 'name', 'address', 'terminalNo', 'lastAlarm', 'alarmTime', 'lastPressure', 'lastSignal'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');

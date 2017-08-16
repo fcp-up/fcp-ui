@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline"> 
+      <el-form :inline="true" :model="formInline" ref="terminalStateForm" class="demo-form-inline"> 
         <el-form-item>
           <el-select v-model="formInline.currentKind"> 
             <el-option 
@@ -22,7 +22,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onQuery">查询</el-button>
+          <el-button type="primary" icon="search" @click="onQuery">查询</el-button>          
           <el-button style='margin-bottom:20px;float:right' type="primary" icon="document" @click="handleDownload">导出excel</el-button>
         </el-form-item>
       </el-form>
@@ -35,24 +35,24 @@
             <span>{{ scope.row.no }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="终端名称" width="250" >
+        <el-table-column prop="name" label="终端名称" width="250" :show-overflow-tooltip="true">
            <template scope="scope">
-            <span>{{ scope.row.name }}</span>
+            <span>{{ scope.row.name}}</span>
            </template>
         </el-table-column>
-        <el-table-column prop="address" label="安装地址" width="300">
+        <el-table-column prop="address" label="安装地址" width="320" :show-overflow-tooltip="true">
             <template scope="scope">
-             <span>{{ scope.row.address }}</span>
+             <span>{{ scope.row.address}}</span>
            </template>
         </el-table-column>        
-        <el-table-column prop="alarmPhone" label="报警电话" width="300">
+        <!-- <el-table-column prop="alarmPhone" label="报警电话" width="300">
             <template scope="scope">
             <span>{{ scope.row.alarmPhone }}</span>
            </template>
-        </el-table-column>        
+        </el-table-column>         -->
         <el-table-column prop="state" label="当前状态" width="100">
           <template scope="scope">
-            <span>{{ scope.row.state }}</span>
+            <span v-bind:class="{'offline': scope.row.isOffline }">{{ scope.row.state }}</span>
           </template>
         </el-table-column>
          <el-table-column prop="lastOnlineTime" label="状态时间" width="180">
@@ -86,6 +86,9 @@
 }
 .pagination {
   text-align: center;
+}
+.offline {
+  color: red;
 }
 </style>
 
@@ -126,9 +129,16 @@ export default {
     fetchData() {
       this.listLoading = false;      
       this.listQuery = {
-        pageSize: this.page.pageSize || 10,
-        pageIndex: this.page.currentPage || 1
+        pageSize: this.page.pageSize || 8,
+        pageIndex: this.page.currentPage || 1        
       }
+      if (this.formInline.keywords != '') {
+         if (this.formInline.currentKind == 'terminalNo') {
+            this.listQuery.subNo = this.formInline.keywords
+         }else{
+            this.listQuery.subName = this.formInline.keywords
+         } 
+      }     
       getTerminalList(this.listQuery).then(response => {
         let res = response.data;
         if(res.code === 0){         
@@ -137,6 +147,7 @@ export default {
           this.list.forEach(function(item,index){
              this.list[index].state = item.lastOnlineState == 1 ? '在线' : (item.lastOnlineState == 0?'离线':item.lastOnlineState);
              this.list[index].stateTime = item.lastOnlineTime == undefined ? '' : parseTime(item.lastOnlineTime) ; 
+             this.list[index].isOffline = item.lastOnlineState == 1 ? false : true; 
           },this);
         }else{
           console.log('查询终端状态出错.');
@@ -152,8 +163,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['终端编号', '终端名称', '安装地址', '报警电话', '当前状态', '状态时间', '信号强度'];
-        const filterVal = ['no', 'name', 'address', 'alarmPhone', 'state', 'stateTime', 'lastSignal'];
+        const tHeader = ['终端编号', '终端名称', '安装地址', '当前状态', '状态时间', '信号强度'];
+        const filterVal = ['no', 'name', 'address', 'state', 'stateTime', 'lastSignal'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');

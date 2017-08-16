@@ -1,12 +1,8 @@
 import fetch from 'utils/fetch';
 
 export function getDeviceList(requestParams) {
-  const reqParams = {
-    pageSize: requestParams.pageSize || 10,
-    pageIndex: requestParams.currentPage || 1
-  }
   const getParams = new URLSearchParams();
-  getParams.append('params', JSON.stringify(reqParams));
+  getParams.append('params', JSON.stringify(requestParams));
   return fetch({
     url: '/fcp/device/list',
     method: 'get',

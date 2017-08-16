@@ -78,7 +78,7 @@ export default {
           deviceList.forEach(function (item) {
             if (item.longitude && item.latitude) {
               // console.log("longitude:" + item.longitude + ' latitude:' + item.latitude);
-              item.icon = (item.icon == 1) ? alarmMarker : normalMarker;
+              item.icon = (item.lastIsAlarm == 1) ? alarmMarker : normalMarker;
               // item.icon = alarmMarker;
               let marker = {
                 devNo: item.no,
