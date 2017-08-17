@@ -13,7 +13,7 @@
           </el-select>          
         </el-form-item>
         <el-form-item>
-          <el-input v-model="formInline.keywords" placeholder="输入相应内容检索"></el-input>
+          <el-input v-model="formInline.queryStr" placeholder="输入相应内容检索"></el-input>
         </el-form-item>
         <el-form-item label="当前状态">
           <el-select v-model="formInline.deviceState" placeholder="默认"> 
@@ -47,7 +47,7 @@
         </el-table-column>        
         <el-table-column prop="alarmTime" label="数据时间" width="180">
         </el-table-column>   
-        <el-table-column prop="address" label="设备位置" width="250" :show-overflow-tooltip="true">
+        <el-table-column prop="address" label="设备安装位置" width="250" :show-overflow-tooltip="true">
         </el-table-column>             
         <el-table-column prop="lastPressure" label="电池电压" width="120">
         </el-table-column> 
@@ -94,8 +94,8 @@ export default {
       formInline: {
         startTime: '',
         endTime: '',
-        keywords: '',
-        currentKind: 'deviceNo',
+        queryStr: '',
+        currentKind: 'subDeviceNo',
         deviceState: '0'
       },
       pickerOptions: {
@@ -106,17 +106,16 @@ export default {
       list: null,
       listLoading: true, 
       queryKind: [
-        { label: '按设备编号', value: 'deviceNo' },
-        { label: '按设备名称', value: 'deviceName' },
-        { label: '按终端编号', value: 'terminalNo' },
-        { label: '按终端名称', value: 'terminalName' }
+        { label: '按设备编号', value: 'subDeviceNo' },
+        { label: '按设备名称', value: 'subDeviceName' },
+        { label: '按终端编号', value: 'subTerminalNo' },
+        { label: '按终端名称', value: 'subTerminalName' }
       ],
       deviceStateList: [
         { label: '默认', value: '0' },
         { label: '正常', value: '1' },
         { label: '报警', value: '2' }
       ],
-      terminalOrDevice: '1',
       page: {
         currentPage: null,
         pageSize: 10,
@@ -131,18 +130,23 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      this.listQuery = {
-        pageSize: this.page.pageSize || 10,
-        pageIndex: this.page.currentPage || 1
+      let listQuery = {
+        'pageSize': this.page.pageSize || 10,
+        'pageIndex': this.page.currentPage || 1
       }
-      if (this.formInline.keywords) {
-        if (this.formInline.currentKind === 'terminalKey') {
-          this.listQuery.terminalKey = this.formInline.keywords
-        }else{
-          this.listQuery.deviceKey = this.formInline.keywords
-        }
+      // 根据条件查询
+      if (this.formInline.queryStr  != '') {
+          if(this.formInline.currentKind == 'subDeviceNo'){
+             listQuery.subDeviceNo = this.formInline.queryStr
+          }else if (this.formInline.currentKind == 'subDeviceName') {
+             listQuery.subDeviceName = this.formInline.queryStr
+          }else if (this.formInline.currentKind == 'subTerminalNo') {
+             listQuery.subTerminalNo = this.formInline.queryStr
+          }else{
+             listQuery.subTerminalName = this.formInline.queryStr
+          }
       }
-      getDeviceDataList(this.listQuery).then(response => {
+      getDeviceDataList(listQuery).then(response => {
         let res = response.data;
         if (res.code == 0){
           this.list = res.data;

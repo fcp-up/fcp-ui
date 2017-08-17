@@ -25,21 +25,26 @@
      <el-row>
       <el-table :data="list" v-loading.body="listLoading" element-loading-text="拼命加载中" 
         border style="width: 100%">
+        <el-table-column type="index" label="序号" width="80">
+        </el-table-column>
         <el-table-column prop="no" label="设备编号" width="120">
         </el-table-column >
-        <el-table-column prop="address" label="安装地址" width="400">
-        </el-table-column>
-         <el-table-column prop="terminalNo" label="终端编号" width="120">
-        </el-table-column >         
+          <el-table-column prop="name" label="设备名称" width="200" :show-overflow-tooltip="true">
+        </el-table-column >
+        <el-table-column prop="address" label="设备安装地址" width="230" :show-overflow-tooltip="true">
+        </el-table-column> 
+        <el-table-column prop="alarmPhone" label="报警电话" width="230">
+        </el-table-column >
+        <el-table-column prop="terminalNo" label="终端编号" width="120">
+        </el-table-column >                 
          <el-table-column prop="longitude" label="位置经度" width="150">
         </el-table-column >
         <el-table-column prop="latitude" label="位置纬度" width="150">
-        </el-table-column > 
-        <el-table-column prop="name" label="设备名称" width="280">
-        </el-table-column >
-        <el-table-column label="操作" width="100" fixed="right">
+        </el-table-column >        
+        <el-table-column label="操作" width="220" fixed="right">
           <template scope="scope">
             <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>            
+            <el-button size="small" icon="edit" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">报警电话</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -84,11 +89,13 @@ export default {
     return {
       formInline: {
         queryStr: '',
-        currentKind: '1'
+        currentKind: 'subDeviceNo'
       },
       queryKind: [
-        { label: '按终端编号', value: '1' },
-        { label: '按终端名称', value: '2' }
+        { label: '按设备编号', value: 'subDeviceNo' },
+        { label: '按设备名称', value: 'subDeviceName' },
+        { label: '按终端编号', value: 'subTerminalNo' },
+        { label: '按终端名称', value: 'subTerminalName' }
       ],
       list: null,
       listLoading: true, 
@@ -106,11 +113,22 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      const requestParams = {
-        'queryStr': this.formInline.queryStr || '',
-        'currentPage': this.page.currentPage || 1,
-        'pageSize': this.page.pageSize || 10
-      } 
+      let requestParams = {
+        pageIndex: this.page.currentPage || 1,
+        pageSize: this.page.pageSize || 10
+      }
+      // 根据条件查询
+      if (this.formInline.queryStr  != '') {
+          if(this.formInline.currentKind == 'subDeviceNo'){
+             requestParams.subDeviceNo = this.formInline.queryStr
+          }else if (this.formInline.currentKind == 'subDeviceName') {
+             requestParams.subDeviceName = this.formInline.queryStr
+          }else if (this.formInline.currentKind == 'subTerminalNo') {
+             requestParams.subTerminalNo = this.formInline.queryStr
+          }else{
+             requestParams.subTerminalName = this.formInline.queryStr
+          }
+      }       
       getDeviceList(requestParams).then(response => {
         let res = response.data;
         console.log(res);
@@ -154,6 +172,9 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row);
+    },
+    handleAlarmPhoneEdit(index, row) {
+      // this.$router.push({ path: 'setterminalalarmphone', query: { terminal: row } });
     }
   }
 };
