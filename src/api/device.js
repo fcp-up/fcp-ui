@@ -44,9 +44,9 @@ export function saveDevice(oldValue, newValue) {
   });
 }
 
-export function addDevice(terminal) {
+export function addDevice(device) {
   const postparams = new URLSearchParams();
-  postparams.append('params', JSON.stringify(terminal));
+  postparams.append('params', JSON.stringify(device));
   return fetch({
     url: '/fcp/device',
     method: 'post',
@@ -57,17 +57,16 @@ export function addDevice(terminal) {
   });
 }
 
-// export function saveTerminalAlarmPhone(terminal) {
-//   const alarmPhone = [{
-//     terminalNo: terminal.no,
-//     phoneNo: terminal.alarmPhoneNo
-//   }];
-//   const terminalInfo = {
-//     params: JSON.stringify(alarmPhone)
-//   };
-//   return fetch({
-//     url: '/fcp/terminal/alarmPhone',
-//     method: 'put',
-//     params: terminalInfo
-//   });
-// }
+export function saveDeviceAlarmPhone(device) {
+  const postparams = {
+    params: JSON.stringify(device)
+  };
+  return fetch({
+    url: '/fcp/device/alarmPhone',
+    method: 'post',
+    params: postparams,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+}

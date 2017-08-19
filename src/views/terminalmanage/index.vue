@@ -13,12 +13,12 @@
           </el-select>          
         </el-form-item>
         <el-form-item>
-          <el-input v-model="formInline.queryStr" placeholder="输入相应内容检索"></el-input>
+          <el-input v-model="formInline.keywords" placeholder="输入相应内容检索"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="search" @click="onQuery">查询</el-button>
-          <el-button type="primary" icon="document" @click="handleDownload">导出excel</el-button>
-          <el-button style='margin-bottom:20px;float:right' type="primary" icon="plus" @click="onAdd">新增终端</el-button>
+          <el-button style='margin-bottom:20px;float:right' type="primary" icon="document" @click="handleDownload">导出excel</el-button>
+          <!-- <el-button style='margin-bottom:20px;float:right' type="primary" icon="plus" @click="onAdd">新增终端</el-button> -->
         </el-form-item>
       </el-form>
     </el-row>
@@ -27,7 +27,7 @@
         fit highlight-current-row  tooltip-effect="dark" style="width: 100%">
          <!-- <el-table-column type="index" label="序号" width="80">
         </el-table-column>  -->
-        <el-table-column prop="no" label="终端编号" width="120" fixed>
+        <el-table-column prop="no" label="终端编号" width="120">
         </el-table-column >
         <el-table-column prop="name" label="终端名称" width="280" :show-overflow-tooltip="true">
         </el-table-column >
@@ -41,9 +41,9 @@
         </el-table-column > 
         <el-table-column label="操作" width="220" fixed="right">
           <template scope="scope">
-            <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑终端</el-button>
+            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑终端</el-button>
             <!-- <el-button size="small" icon="delete" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
-            <el-button size="small" icon="edit" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">报警电话</el-button>
+            <el-button size="small" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">设置报警电话</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -87,12 +87,12 @@ export default {
   data() {
     return {
       formInline: {
-        queryStr: '',
-        currentKind: '1'
+        keywords: '',
+        currentKind: 'terminalNo'
       },
       queryKind: [
-        { label: '按终端编号', value: '1' },
-        { label: '按终端名称', value: '2' }
+        { label: '按终端编号', value: 'terminalNo' },
+        { label: '按终端名称', value: 'terminalName' }
       ],
       list: null,
       listLoading: true, 
@@ -110,12 +110,18 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      const requestParams = {
-        queryStr: this.formInline.queryStr || '',
-        currentPage: this.page.currentPage || 1,
+      let listQuery = {        
+        pageIndex: this.page.currentPage || 1,
         pageSize: this.page.pageSize || 10
+      }
+      if (this.formInline.keywords != '') {
+         if (this.formInline.currentKind == 'terminalNo') {
+            listQuery.subNo = this.formInline.keywords
+         }else{
+            listQuery.subName = this.formInline.keywords
+         } 
       }  
-      getTerminalList(requestParams).then(response => {
+      getTerminalList(listQuery).then(response => {
         let res = response.data;
         if (res.code == 0) {
           this.list = res.data;
@@ -131,8 +137,8 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['终端编号', '报警电话', '安装地址'];
-        const filterVal = ['no', 'alarmPhone', 'address'];
+        const tHeader = ['终端编号', '终端名称', '报警电话', '安装地址'];
+        const filterVal = ['no', 'name', 'alarmPhone', 'address'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');

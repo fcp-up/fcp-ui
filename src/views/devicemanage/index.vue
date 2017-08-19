@@ -43,8 +43,8 @@
         </el-table-column >        
         <el-table-column label="操作" width="220" fixed="right">
           <template scope="scope">
-            <el-button size="small" icon="edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>            
-            <el-button size="small" icon="edit" @click="handleAlarmPhoneEdit(scope.$index, scope.row)">报警电话</el-button>
+            <el-button size="small"  @click="handleEdit(scope.$index, scope.row)">编辑设备</el-button>            
+            <el-button size="small"  @click="handleAlarmPhoneEdit(scope.$index, scope.row)">设置报警电话</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -52,7 +52,7 @@
      <el-row>
       <div class="pagination" v-if="page.total">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="page.currentPage"
-        :page-sizes="page.pageSizes" :page-size="page.pageSize" layout="total, sizes, prev, pager, next" :total="page.total">
+         :page-size="page.pageSize" layout="total, prev, pager, next" :total="page.total">
         </el-pagination>
       </div>
     </el-row> 
@@ -136,7 +136,7 @@ export default {
           this.list = res.data;
           this.page.total = res.total;
         } else {
-          console.log('获取终端列表失败.');
+          console.log('获取设备列表失败.');
         }
         this.listLoading = false;
       })
@@ -146,15 +146,15 @@ export default {
         const {
             export_json_to_excel
           } = require('vendor/Export2Excel');
-        const tHeader = ['设备编号', '设备名称','终端编号','安装地址'];
-        const filterVal = ['no', 'name', 'terminalNo', 'address'];
+        const tHeader = ['设备编号', '设备名称', '报警电话', '终端编号','安装地址'];
+        const filterVal = ['no', 'name', 'alarmPhone', 'terminalNo', 'address'];
         const list = this.list;
         const data = this.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '列表excel');
       })
     },
     onAdd() {
-
+       // 由于考虑到设备自动注册，增加设备功能暂未实现 
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]))
@@ -174,7 +174,7 @@ export default {
       console.log(index, row);
     },
     handleAlarmPhoneEdit(index, row) {
-      // this.$router.push({ path: 'setterminalalarmphone', query: { terminal: row } });
+      this.$router.push({ path: 'setdevalarmphone', query: { device: row } });
     }
   }
 };

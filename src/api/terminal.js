@@ -44,17 +44,16 @@ export function addTerminal(terminal) {
   });
 }
 
-export function saveTerminalAlarmPhone(terminal) {
-  const alarmPhone = [{
-    terminalNo: terminal.no,
-    phoneNo: terminal.alarmPhoneNo
-  }];
-  const terminalInfo = {
-    params: JSON.stringify(alarmPhone)
+export function saveTerminalAlarmPhone(requestParams) {
+  const alarmPhone = {
+    params: JSON.stringify(requestParams)
   };
   return fetch({
     url: '/fcp/terminal/alarmPhone',
-    method: 'put',
-    params: terminalInfo
+    method: 'post',
+    params: alarmPhone,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   });
 }

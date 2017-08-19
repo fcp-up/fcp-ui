@@ -128,18 +128,18 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = false;      
-      this.listQuery = {
+      let listQuery = {
         pageSize: this.page.pageSize || 8,
         pageIndex: this.page.currentPage || 1        
       }
       if (this.formInline.keywords != '') {
          if (this.formInline.currentKind == 'terminalNo') {
-            this.listQuery.subNo = this.formInline.keywords
+            listQuery.subNo = this.formInline.keywords
          }else{
-            this.listQuery.subName = this.formInline.keywords
+            listQuery.subName = this.formInline.keywords
          } 
       }     
-      getTerminalList(this.listQuery).then(response => {
+      getTerminalList(listQuery).then(response => {
         let res = response.data;
         if(res.code === 0){         
           this.list = res.data;

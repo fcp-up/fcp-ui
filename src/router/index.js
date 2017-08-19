@@ -24,6 +24,9 @@ const DeviceManage = _import('devicemanage/index');
 /* editdevice */
 const EditDevice = _import('devicemanage/editdevice');
 
+/* editdevalarmphone */
+const EditDeviceAlarmPhone = _import('devicemanage/editdevalarmphone');
+
 /* adddevice */
 const AddDevice = _import('devicemanage/adddevice');
 
@@ -40,7 +43,7 @@ const EditTerminal = _import('terminalmanage/editterminal');
 const AddTerminal = _import('terminalmanage/addterminal');
 
 // setterminalalarmphone
-const SetTerminalAlarmPhone = _import('terminalmanage/editalarmphone');
+const SetTerminalAlarmPhone = _import('terminalmanage/edittelalarmphone');
 
 /* error page */
 const Err404 = _import('error/404');
@@ -101,7 +104,8 @@ export const asyncRouterMap = [
     noDropdown: true,
     children: [{ path: 'index', component: DeviceManage, name: '设备管理' },
       { path: 'editdevice', component: EditDevice, name: '编辑设备', hidden: true },
-      { path: 'adddevice', component: AddDevice, name: '新增设备', hidden: true }]
+      { path: 'adddevice', component: AddDevice, name: '新增设备', hidden: true },
+      { path: 'setdevalarmphone', component: EditDeviceAlarmPhone, name: '设置设备报警电话', hidden: true }]
   }, {
     path: '/terminal',
     component: Layout,

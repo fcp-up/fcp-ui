@@ -138,7 +138,7 @@ export default {
     this.terminal.alarmPhoneNo = curTerminal.alarmPhone || '';
     this.terminal.address = curTerminal.address || '';
     if (this.terminal.latitude && this.terminal.longitude) {
-      this.markers.push({ position: [this.terminal.longitude,this.terminal.latitude] })
+      this.markers.push({ position: [this.terminal.longitude, this.terminal.latitude] })
     } else {
       this.markers.push({ position: this.center });
       this.terminal.longitude = this.center[0];
@@ -149,7 +149,11 @@ export default {
     submitForm(terminalForm) {
       this.$refs[terminalForm].validate(valid => {
         if (valid) {
-          saveTerminalAlarmPhone(this.terminal).then(response => {
+          const requestParam = [{
+            terminalNo: this.terminal.no,
+            phoneNo: this.terminal.alarmPhoneNo
+          }];
+          saveTerminalAlarmPhone(requestParam).then(response => {
             let res = response.data;
             if (res.code == 0) {
               this.tips = '终端报警电话编辑存储成功.'
