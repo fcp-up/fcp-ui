@@ -27,7 +27,8 @@
             邮箱登录成功,请选择第三方验证
             <social-sign></social-sign>
           </el-dialog> -->
-  
+
+    <h1 class="note">技术支持：昆明桥隧管理有限公司技术研发团队&昆明齐奇科研团队</h1>  
   </div>
 </template>
 
@@ -177,4 +178,11 @@ export default {
     color: #fff;
   }
 }
+ .note {
+    position: fixed;
+    bottom: 0px;
+    margin-left: 25%;
+    color: white;
+    font-size: 24px;
+  }
 </style>
